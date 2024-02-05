@@ -3,20 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeQZ</title>
+<title>SampleQZ</title>
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
-<link href="../Css/Style.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<link rel="stylesheet" href="static/Style.css">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
 
 </head>
 <body>
@@ -28,8 +27,8 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <img src="{{ url_for('static', filename='images/Logo.png') }}" class="image navbar-brand", alt="Logo" />
-                <h1 class="logotexto inline">Code</h1>
-                <h1 class="logotexts inline">QZ</h1>
+                <h1 class="logotexto inline">NAME</h1>
+                <h1 class="logotexts inline">SUBNAME</h1>
             </a>
             <script>
                 const appearance = (element, timeout) => { // убрал неиспользуемый параметр display
@@ -59,13 +58,18 @@
                     {% else %}
                     <a class="nav-link" href="/profile">Профиль</a>
                     {% endif %}
+                    <button id="theme-toggler" class="nav-link btn btn-link" aria-label="Переключить тему" style="margin-top: auto; margin-bottom: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="icon-moon" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path d="M16 8a8 8 0 1 1-11.314-5.874 7.97 7.97 0 0 1 4.72 4.721A7 7 0 0 0 16 8z"/>
+                        </svg>
+                    </button>
                 </div>
+
             </div>
         </div>
     </nav>
 </header>
 
-<!-- Добавьте ваш контент здесь -->
 <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
     <div class="modal-dialog" role="document", id="register">
         <div class="modal-content rounded-4 shadow">
@@ -74,11 +78,19 @@
             </div>
 
         <div class="modal-body p-5 pt-0">
-        <form method="post" action="/register">
+        <form method="post" action="/register", enctype="multipart/form-data">
 
             <input type="email" name="email" placeholder="Email" required class="form-control rounded-3" id="floatingInput"><br>
             <input class="form-control rounded-3" type="password" name="password" id="pass" placeholder="Password" required><br>
             <input class="form-control rounded-3" type="password" name="confirm_password" id="repeat" placeholder="Confirm Password" required><br>
+            <div class="mb-3">
+                <label for="avatar" class="form-label">Выберите аватар</label>
+                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" hidden>
+                <button type="button" class="btn btn-primary btn-block mt-2" onclick="document.getElementById('avatar').click()">Загрузить аватар</button>
+            </div>
+
+
+
             <p id="valid"></p>
             <input class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit", id="regbut", value="Register">
             {% with messages = get_flashed_messages() %}
@@ -96,7 +108,7 @@
     </div>
 </div>
 </div>
-    
+
 
 
 <footer class="footer bg-success py-3">
@@ -138,12 +150,19 @@
 	});
 
 </script>
+<script>
+document.getElementById('file-upload').addEventListener('change', function() {
+    var input = this;
+    var filenameDisplay = document.getElementById('file-upload-filename');
+    filenameDisplay.value = input.files && input.files.length > 0 ? input.files[0].name : 'Выберите аватар';
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
 <script>AOS.init();</script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.1.9/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doMkKqN5JWi1toQdP5VTp0oGdjl5jBP4epzj1K9phqgwwHJT6/7P4ps" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
-
+<<script src="static/JS/theme-switcher.js"></script>
 </body>
 </html>
