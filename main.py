@@ -6,6 +6,12 @@ from werkzeug.utils import secure_filename
 import os
 from flask import send_from_directory
 
+from art import *
+from colorama import Fore, Back, Style
+
+Art = text2art("CodeQZ",font='big',chr_ignore=True) # Return ASCII text with block font
+print(Fore.GREEN + Art)
+
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
