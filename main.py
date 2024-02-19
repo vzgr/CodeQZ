@@ -143,7 +143,6 @@ def register():
             save_path = os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename)
             img.save(filename_override=save_path)  # Убедиться, что метод save принимает полный путь
             new_user.avatar = avatar_filename
-            print(f"Saved {avatar_filename} in {app.config['UPLOAD_FOLDER']}")
         else:
             return 'File type not allowed', 400
         try:

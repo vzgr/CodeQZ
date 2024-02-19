@@ -194,6 +194,40 @@ document.getElementById('file-upload').addEventListener('change', function() {
     filenameDisplay.value = input.files && input.files.length > 0 ? input.files[0].name : 'Выберите аватар';
 });
 </script>
+<script>
+
+	let valid = document.getElementById("valid");
+	let pass = document.getElementById("pass");
+	let regbut = document.getElementById("regbut");
+	let repeat = document.getElementById("repeat");
+
+	regbut.setAttribute("disabled", "yes");
+
+	pass.addEventListener("input",(e)=>{
+		if(pass.value.length < 8){
+			valid.innerHTML = "<span style=\"color:red;\">длина пароля должна составлять хотябы 8 символов</span>";
+			regbut.setAttribute("disabled", "yes");
+		} else if (pass.value == repeat.value){
+			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
+			regbut.removeAttribute("disabled");
+		} else {
+			valid.innerHTML = "";
+		}
+	});
+	repeat.addEventListener("input",(e)=>{
+		if(pass.value != repeat.value){
+			valid.innerHTML = "<span style=\"color:red;\">пароли не совпадают</span>";
+			regbut.setAttribute("disabled", "yes");
+		} else if (pass.value.length >= 8){
+			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
+			regbut.removeAttribute("disabled");
+		}  else{
+			valid.innerHTML = "";
+
+		}
+	});
+
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
