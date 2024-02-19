@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SampleQZ</title>
-
+<title>CodeQZ</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
@@ -13,12 +15,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="static/Style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
-
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="light-theme">
+
 
 <link rel="stylesheet" href="static/Style.css">
 
@@ -27,8 +33,8 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <img src="{{ url_for('static', filename='images/Logo.png') }}" class="image navbar-brand", alt="Logo" />
-                <h1 class="logotexto inline">NAME</h1>
-                <h1 class="logotexts inline">SUBNAME</h1>
+                <h1 class="logotexto inline">Code</h1>
+                <h1 class="logotexts inline">QZ</h1>
             </a>
             <script>
                 const appearance = (element, timeout) => { // убрал неиспользуемый параметр display
@@ -69,87 +75,118 @@
         </div>
     </nav>
 </header>
+<div class="container">
+    <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
+        <div class="modal-dialog" role="document", id="register">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header p-5 pb-4 border-bottom-0">
+                    <h1 class="fw-bold mb-0 fs-2" style="font-size: 1.5rem;">Зарегистрируйтесь</h1>
+                </div>
 
-<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
-    <div class="modal-dialog" role="document", id="register">
-        <div class="modal-content rounded-4 shadow">
-            <div class="modal-header p-5 pb-4 border-bottom-0">
-                <h1 class="fw-bold mb-0 fs-2" style="font-size: 1.5rem;">Зарегистрируйтесь</h1>
+            <script>
+            $(document).ready(function() {
+                var $image_crop = $('#image-demo').croppie({
+                    enableExif: true,
+                    viewport: {
+                        width: 200,
+                        height: 200,
+                        type: 'circle'
+                    },
+                    boundary: {
+                        width: 300,
+                        height: 300
+                    }
+                });
+
+                $('#avatar').on('change', function() {
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        $image_crop.croppie('bind', {
+                            url: event.target.result
+                        }).then(function() {
+                            console.log('jQuery bind complete');
+                        });
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                    $('#cropImageModal').modal('show');
+                });
+
+                $('#cropImageBtn').click(function(event) {
+                    $image_crop.croppie('result', {
+                        type: 'canvas',
+                        size: 'viewport'
+                    }).then(function(response) {
+                        // Сохраняем обрезанное изображение в скрытое поле формы
+                        $('#avatarBase64').val(response);
+                        // Закрываем модальное окно после сохранения обрезанного изображения
+                        $('#cropImageModal').modal('hide');
+                    });
+                });
+            });
+            </script>
+
+                <div class="modal-body p-5 pt-0">
+                    <form method="post" action="/register" enctype="multipart/form-data">
+                        <input type="email" name="email" placeholder="Email" required class="form-control rounded-3" id="floatingInput"><br>
+                        <input class="form-control rounded-3" type="password" name="password" id="pass" placeholder="Password" required><br>
+                        <input class="form-control rounded-3" type="password" name="confirm_password" id="repeat" placeholder="Confirm Password" required><br>
+                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" hidden>
+                        <!-- Скрытое текстовое поле для хранения данных обрезанного изображения -->
+                        <input type="hidden" id="avatarBase64" name="avatarBase64">
+                        <button type="button" class="btn btn-primary btn-block mt-2" onclick="document.getElementById('avatar').click()">Загрузить аватар</button>
+                        <div id="cropImageModal" class="modal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Обрезать аватар</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div id="image-demo"></div> <!-- Контейнер для Croppie -->
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" id="cropImageBtn" class="btn btn-primary">Применить</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="valid"></p>
+                        <input class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit", id="regbut", value="Register">
+                    </form>
+                </div>
+                </div>
+
+
+
+
+                {% with messages = get_flashed_messages() %}
+                   {% if messages %}
+                      {% for message in messages %}
+                         {{ message }}
+                      {% endfor %}
+                   {% endif %}
+                {% endwith %}
+
+            </form>
             </div>
 
-        <div class="modal-body p-5 pt-0">
-        <form method="post" action="/register", enctype="multipart/form-data">
 
-            <input type="email" name="email" placeholder="Email" required class="form-control rounded-3" id="floatingInput"><br>
-            <input class="form-control rounded-3" type="password" name="password" id="pass" placeholder="Password" required><br>
-            <input class="form-control rounded-3" type="password" name="confirm_password" id="repeat" placeholder="Confirm Password" required><br>
-            <div class="mb-3">
-                <label for="avatar" class="form-label">Выберите аватар</label>
-                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" hidden>
-                <button type="button" class="btn btn-primary btn-block mt-2" onclick="document.getElementById('avatar').click()">Загрузить аватар</button>
-            </div>
-
-
-
-            <p id="valid"></p>
-            <input class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit", id="regbut", value="Register">
-            {% with messages = get_flashed_messages() %}
-               {% if messages %}
-                  {% for message in messages %}
-                     {{ message }}
-                  {% endfor %}
-               {% endif %}
-            {% endwith %}
-
-        </form>
         </div>
-
-
+    </div>
     </div>
 </div>
-</div>
-
-
 
 <footer class="footer bg-success py-3">
     <div class="container">
         <span>&copy; 2024 NExt team. <a href="https://github.com/vzgr/CodeQZ"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png", class="githublogo"></a></span>
     </div>
 </footer>
-<script>
 
-	let valid = document.getElementById("valid");
-	let pass = document.getElementById("pass");
-	let regbut = document.getElementById("regbut");
-	let repeat = document.getElementById("repeat");
 
-	regbut.setAttribute("disabled", "yes");
 
-	pass.addEventListener("input",(e)=>{
-		if(pass.value.length < 8){
-			valid.innerHTML = "<span style=\"color:red;\">длина пароля должна составлять хотябы 8 символов</span>";
-			regbut.setAttribute("disabled", "yes");
-		} else if (pass.value == repeat.value){
-			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
-			regbut.removeAttribute("disabled");
-		} else {
-			valid.innerHTML = "";
-		}
-	});
-	repeat.addEventListener("input",(e)=>{
-		if(pass.value != repeat.value){
-			valid.innerHTML = "<span style=\"color:red;\">пароли не совпадают</span>";
-			regbut.setAttribute("disabled", "yes");
-		} else if (pass.value.length >= 8){
-			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
-			regbut.removeAttribute("disabled");
-		}  else{
-			valid.innerHTML = "";
-
-		}
-	});
-
-</script>
 <script>
 document.getElementById('file-upload').addEventListener('change', function() {
     var input = this;
@@ -157,12 +194,11 @@ document.getElementById('file-upload').addEventListener('change', function() {
     filenameDisplay.value = input.files && input.files.length > 0 ? input.files[0].name : 'Выберите аватар';
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init();</script>
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.1.9/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doMkKqN5JWi1toQdP5VTp0oGdjl5jBP4epzj1K9phqgwwHJT6/7P4ps" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
-<<script src="static/JS/theme-switcher.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<script src="static/JS/theme-switcher.js"></script>
+<!-- Включите здесь скрипт, который обрабатывает выбор, обрезку и отправку изображения -->
 </body>
 </html>

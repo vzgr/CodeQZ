@@ -114,6 +114,26 @@ width: 50px;
 
 }
 
+#theme-toggler {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Стили иконки в разных темах */
+.light-theme .icon-moon {
+    color: #fff; /* Цвет иконки в тёмной теме */
+}
+
+.dark-theme .icon-moon {
+    color: #000; /* Цвет иконки в светлой теме */
+}
+.dark-theme {
+    background-color: #1b1d1e;
+}
+.light-theme {
+    background-color: #ffffff;
+}
 
 .btn-primary{
 	background: var(--accent);

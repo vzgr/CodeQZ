@@ -5,11 +5,13 @@ from flask import session
 from werkzeug.utils import secure_filename
 import os
 from flask import send_from_directory
-
+import base64
+from io import BytesIO
+from PIL import Image
 from art import *
 from colorama import Fore, Back, Style
 
-Art = text2art("CodeQZ",font='big',chr_ignore=True) # Return ASCII text with block font
+Art = text2art("CodeQZ",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
 
 
@@ -33,6 +35,42 @@ def before_request():
         first_request_initialized = True
 
 
+class Base64Image:
+    def __init__(self, base64_str, filename='default_image'):
+        # Проверяем наличие заголовка в строке и обрабатываем соответствующим образом
+        if ";base64," in base64_str:
+            # Если в строке есть информация о MIME, разделяем ее на заголовок и данные
+            header, base64_encoded_data = base64_str.split(";base64,")
+            self.base64_str = base64_encoded_data
+            _, extension = header.split('/')
+            self.extension = extension if extension != 'jpeg' else 'jpg'
+        else:
+            # Если в строке нет заголовка, предполагаем, что данные в формате PNG
+            self.base64_str = base64_str
+            self.extension = 'png'  # Стандартное расширение, если не удается определить другое
+
+        self.filename = filename
+        self.image = self._decode()
+
+    def _decode(self):
+        # Теперь функция просто декодирует данные и загружает изображение
+        decoded_data = base64.b64decode(self.base64_str)
+        image = Image.open(BytesIO(decoded_data))
+        return image
+
+    def save(self, path="", filename_override=None):
+        filename = filename_override if filename_override else f"{self.filename}.{self.extension}"
+        full_path = f"{path}{filename}"
+        self.image.save(full_path)
+        return full_path
+    def save(self, path="", filename_override=None):
+        if filename_override:
+            full_filename = filename_override
+        else:
+            full_filename = f"{self.filename}.{self.extension}"
+        full_path = f"{path}{full_filename}"
+        self.image.save(full_path)
+        return full_path
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
@@ -41,7 +79,12 @@ class User(db.Model):
     pytest = db.Column(db.String(100))
     jstest = db.Column(db.String(100))
 
-
+class Test(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    testname = db.Column(db.String, nullable=False)
+    question = db.Column(db.String, nullable=False)
+    options = db.Column(db.String, nullable=False)
+    correctAnswer = db.Column(db.String, nullable=False)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -64,8 +107,9 @@ def get_extension(filename):
         # Возвращаем пустую строку, если точка не найдена
         return ""
 
-
-
+@app.route('/admin')
+def admin():
+    return render_template('Admin.html')
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -77,18 +121,31 @@ def register():
             # Здесь пользователь уже существует, сообщаем об этом
             flash('Email address already exists')
             return redirect(url_for('register'))
-
         # Если пользователя нет, то создаем нового
         new_user = User(email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), unitytest=0,
                         pytest=0, jstest=0)
-        file = request.files['avatar']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            # Убираем все после '@' и добавляем имя файла
-            avatar_filename = email + get_extension(filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename))
-            new_user.avatar = avatar_filename
 
+        base64_string = request.form['avatarBase64']
+
+        if not base64_string:
+            return 'No image data found', 400
+
+        # Создаем экземпляр класса Base64Image
+        img = Base64Image(base64_string)
+
+        # Проверяем, допустимо ли расширение файла.
+        filename = secure_filename(img.filename + '.' + img.extension)
+        filename = secure_filename(img.filename + '.' + img.extension)
+        if allowed_file(filename):
+            # Указываем имя файла без '@' и добавляем расширение
+            avatar_filename = email + get_extension(filename)
+            # Сохраняем изображение в папку UPLOAD_FOLDER
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], avatar_filename)
+            img.save(filename_override=save_path)  # Убедиться, что метод save принимает полный путь
+            new_user.avatar = avatar_filename
+            print(f"Saved {avatar_filename} in {app.config['UPLOAD_FOLDER']}")
+        else:
+            return 'File type not allowed', 400
         try:
             # Пытаемся добавить пользователя и сохранить изменения
             db.session.add(new_user)
@@ -102,6 +159,8 @@ def register():
             return redirect(url_for('register'))
 
     return render_template('Register.html')
+
+
 
 
 @app.route('/')

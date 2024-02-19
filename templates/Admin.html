@@ -1,10 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SampleQZ</title>
+
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -16,17 +19,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
 
-
 </head>
-<body class="light-theme">
+<body>
+
+<link rel="stylesheet" href="static/Style.css">
 
 <header>
-    <!-- Bootstrap навигационная панель -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <h1 class="logotexto inline">Code</h1>
-                <h1 class="logotexts inline">QZ</h1>
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" class="image navbar-brand", alt="Logo" />
+                <h1 class="logotexto inline">NAME</h1>
+                <h1 class="logotexts inline">SUBNAME</h1>
             </a>
             <script>
                 const appearance = (element, timeout) => { // убрал неиспользуемый параметр display
@@ -62,89 +66,126 @@
                         </svg>
                     </button>
                 </div>
+
             </div>
         </div>
     </nav>
 </header>
 
- <div class="container col-xxl-8 px-4 py-5">
-    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-		<div class="col-10 col-sm-8 col-lg-6"><div id="box">
-        <img src="{{ url_for('static', filename='images/Next team.svg') }}" class="pre d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy"></div>
-      </div>
-      <div class="col-lg-6 about">
-		  <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Мы</h1>
-        <p class="lead">команда разработчиков из Санкт-Петербурга, имеем опыт разработки сайтов и активно развиваемся дальше. Этот сайт мы создали для марафона умный Петербург, задача сайта в том, чтобы проходить опросы и тесты, повышая свои знания.</p>
-        </div>
-      </div>
+<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
+    <div class="modal-dialog" role="document", id="register">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2" style="font-size: 1.5rem;">Welcome to the admin panel!</h1>
+            </div>
+
+            <div class="modal-body p-5 pt-0">
+                <button type="button" class="btn btn-primary btn-block mt-2", id = "loadMenuButton">Write a new test</button>
+                <div id="menuContainer"></div>
+            </div>
     </div>
-  </div>
+</div>
+</div>
+
+
 
 <footer class="footer bg-success py-3">
     <div class="container">
         <span>&copy; 2024 NExt team. <a href="https://github.com/vzgr/CodeQZ"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png", class="githublogo"></a></span>
     </div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
 <script>AOS.init();</script>
-<script>// scripts.js
-$(document).ready(function() {
-  $('.content-wrapper').fadeIn(1000);
-});
-</script>
-<style>
-
-img.pre{
-  transition: 0.1s;
-  position: relative;
-  transform-style: preserve-3d;
-  transform: perspective(5000px) rotateY(var(--rotateX)) rotateX(var(--rotateY));
-}
-
-
-#box:not( :hover ){
-  img.pre{
-  transform: none;
-  transition: 1s;
-  }
-}
-
-
-</style>
-
 <script>
-	const pre = document.getElementsByClassName("pre")[0];
+let testData = [];
+$(document).ready(function(){
+    $("#loadMenuButton").click(function(){
+        $(this).hide();
 
-document.getElementById("box").addEventListener("mousemove", (e) => {
-  rotateElement(e, pre);
+        var menuContent = `
+        <input class="form-control rounded-3 questionInput" type="text" placeholder="Question" required><br>
+        <div class="container mt-5">
+        <form id="testForm">
+            <!-- Динамически добавляем опции и радиокнопки -->
+            <!-- Теперь будут повторены 5 раз для 5 пар вариантов и радиокнопок -->
+            `;
+            for (let i = 1; i <= 5; i++) {
+                menuContent += `
+                <div class="row align-items-center mb-3">
+                    <div class="col-auto">
+                        <input class="form-check-input" type="radio" name="radioOptions" required value="Option ${i}">
+                    </div>
+                    <div class="col">
+                        <input class="form-control rounded-3" type="text" placeholder="Option ${i}" required>
+                    </div>
+                </div>
+                `;
+            }
+
+            menuContent += `
+        </form>
+    </div>
+    <p id="valid"></p>
+    <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" id="regbut">Add test</button>
+    `;
+
+        $("#menuContainer").html(menuContent).show();
+
+        $('#regbut').click(function(event){
+            event.preventDefault();
+
+            // Проверим, что все поля заполнены
+            let isFormValid = true;
+            $('#testForm').find('input[type="text"], input[type="radio"]:checked').each(function() {
+                if (!$(this).val()) {
+                    isFormValid = false;
+                }
+            });
+
+            if(!isFormValid) {
+                alert("Пожалуйста, заполните все поля и выберите хотя бы одну опцию.");
+                return;
+            }
+
+            let questionData = {
+                question: $('.questionInput').val(),
+                options: [],
+                selectedOption: $('input[type="radio"]:checked').val(),
+            };
+
+            $('#testForm').find('.form-control.rounded-3').each(function(index) {
+                if (index > 0) {
+                    questionData.options.push($(this).val());
+                }
+            });
+
+            testData.push(questionData);
+
+            if (testData.length >= 10) {
+                $.ajax({
+                    type: "POST",
+                    url: "/add_test_batch",
+                    contentType: "application/json",
+                    data: JSON.stringify(testData),
+                    success: function(response){
+                        alert("Пакет тестов успешно добавлен!");
+                        testData = [];
+                        window.location.href = "/"; // Возвращаемся на главную страницу
+                    }
+                });
+            } else {
+                alert("Тест добавлен. Всего добавлено: " + testData.length);
+            }
+
+            $('.questionInput').val('');
+            $('input[type="text"]').val('');
+            $('input[type="radio"]').prop('checked', false);
+        });
+    });
 });
-
-function rotateElement(event, element) {
-  // get mouse position
-  const x = event.clientX -element.getBoundingClientRect().left;
-  const y = event.clientY -element.getBoundingClientRect().top;
-
-  // console.log(x, y)
-  //console.log(element.offset())
-  // find the middle
-  const middleX = element.getBoundingClientRect().width/2;
-  const middleY = element.getBoundingClientRect().height/2;
-  // console.log(middleX, middleY)
-  //console.log(middleX)
-
-  // get offset from middle as a percentage
-  // and tone it down a little
-  const offsetX = ((x - middleX) / middleX) * 20;
-  const offsetY = ((y - middleY) / middleY) * 20;
-  // console.log(offsetX, offsetY);
-
-  // set rotation
-  element.style.setProperty("--rotateX", offsetX + "deg");
-  element.style.setProperty("--rotateY", -1 * offsetY + "deg");
-}
-
 </script>
-<!-- Подключаем Bootstrap JavaScript -->
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.1.9/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doMkKqN5JWi1toQdP5VTp0oGdjl5jBP4epzj1K9phqgwwHJT6/7P4ps" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
