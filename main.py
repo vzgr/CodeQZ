@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 
 Art = text2art("CodeQZ",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
-
+print(Fore.LIGHTWHITE_EX)
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -300,4 +300,4 @@ def jstest():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=80, host="0.0.0.0")
+    app.run(debug=False, port=80, host="0.0.0.0")
