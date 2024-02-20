@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='images/Logo.png') }}" class="image navbar-brand", alt="Logo" />
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Logo", class="navbar-brand">
                 <h1 class="logotexto inline">Code</h1>
                 <h1 class="logotexts inline">QZ</h1>
             </a>
@@ -60,11 +60,18 @@
                     {% else %}
                     <a class="nav-link" href="/profile">Профиль</a>
                     {% endif %}
+                    <button id="theme-toggler" class="nav-link btn btn-link" aria-label="Переключить тему" style="margin-top: auto; margin-bottom: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="icon-moon" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path d="M16 8a8 8 0 1 1-11.314-5.874 7.97 7.97 0 0 1 4.72 4.721A7 7 0 0 0 16 8z"/>
+                        </svg>
+                    </button>
                 </div>
+
             </div>
         </div>
     </nav>
 </header>
+
 
 <div id="confrim">
 <div class="modal modal-sheet d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSheet">
