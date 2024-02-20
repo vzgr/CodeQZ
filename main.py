@@ -73,6 +73,7 @@ class Base64Image:
         return full_path
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     unitytest = db.Column(db.String(100))
@@ -115,15 +116,23 @@ def register():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
+        nick = request.form.get('nickname')
         user = User.query.filter_by(email=email).first()
 
         if user:
-            # Здесь пользователь уже существует, сообщаем об этом
-            flash('Email address already exists')
             return redirect(url_for('register'))
-        # Если пользователя нет, то создаем нового
-        new_user = User(email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), unitytest=0,
-                        pytest=0, jstest=0)
+
+        # Создаем нового пользователя
+        new_user = User(nickname=nick,
+                        email=email,
+                        password=generate_password_hash(password, method='pbkdf2:sha256'),
+                        unitytest=0, pytest=0, jstest=0)
+
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+
+
 
         base64_string = request.form['avatarBase64']
 
@@ -134,7 +143,6 @@ def register():
         img = Base64Image(base64_string)
 
         # Проверяем, допустимо ли расширение файла.
-        filename = secure_filename(img.filename + '.' + img.extension)
         filename = secure_filename(img.filename + '.' + img.extension)
         if allowed_file(filename):
             # Указываем имя файла без '@' и добавляем расширение
@@ -149,12 +157,10 @@ def register():
             # Пытаемся добавить пользователя и сохранить изменения
             db.session.add(new_user)
             db.session.commit()
-            flash('Registration successful! Please login.')
-            return redirect(url_for('login'))
+            return redirect(url_for('profile'))
         except sqlalchemy.exc.IntegrityError:
             # Если возникла ошибка IntegrityError, то откатываем изменения
             db.session.rollback()
-            flash('An error occurred. Email might be already registered.')
             return redirect(url_for('register'))
 
     return render_template('Register.html')
@@ -176,12 +182,8 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
-            flash('Login successful!')
-            print("you loged in!")
             session['user_id'] = user.id
             return redirect(url_for('profile'))
-        else:
-            flash('Invalid login credentials!')
 
     return render_template('Login.html')
 
@@ -189,7 +191,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
-    flash('You have been logged out.')
     return redirect(url_for('login'))
 
 
@@ -199,7 +200,6 @@ def process():
         return jsonify({"error": "Unauthorized access"}), 401
 
     user_id = session['user_id']
-    print(user_id)
     data = request.get_json(force=True)
 
     page = data.get('page')
@@ -210,14 +210,14 @@ def process():
 
     if hasattr(User, page):
         user = db.session.get(User, user_id)
-        print(user)
         if user:
             setattr(user, page, variable)
             db.session.commit()
-            print("commited!")
+
             return jsonify({"success": f"Column {page} updated with value {variable} for user {user_id}."})
         else:
-            print("dont commited!")
+
+
             return jsonify({"error": "User not found"}), 404
     else:
         return jsonify({"error": f"Column {page} does not exist in User model"}), 400
@@ -231,8 +231,6 @@ def uploaded_file(filename):
 def find_avatar_filename(email):
     base_dir = os.path.abspath(os.path.dirname(__file__))  # file заменено на __file__
     upload_dir = os.path.join(base_dir, 'uploads')  # убран слеш перед uploads
-    print(str(upload_dir) + " directory")
-
     # Имя файла без расширения, оставляем email без изменений
     filename_without_extension = email
 
@@ -240,9 +238,7 @@ def find_avatar_filename(email):
         # Дополнительно очищаем только расширение файла, но не само имя файла
         safe_extension = secure_filename(extension)
         filename = f"{filename_without_extension}.{safe_extension}"  # Создаем имя файла
-        print(str(filename) + " filename")
         file_path = os.path.join(upload_dir, filename)  # Полный путь к файлу
-        print(str(file_path) + " filepath")
         if os.path.isfile(file_path):
             return filename
 
@@ -261,7 +257,6 @@ def profile():
             jtest = user.jstest
             ptest = user.pytest
             avatar_filename = find_avatar_filename(email)
-            print(avatar_filename)# Получаем имя файла с правильным расширением
             if avatar_filename:
                 avatar_url = url_for('uploaded_file', filename=avatar_filename)
             else:
@@ -269,10 +264,8 @@ def profile():
             return render_template('profile.html', user=user, is_authenticated=is_authenticated, avatar_url=avatar_url, javastest=jtest,
                                    pythtest=ptest, unitygametest=utest)
         else:
-            flash('User not found.')
             return redirect(url_for('login'))
     else:
-        flash('You are not logged in.')
         return redirect(url_for('login'))
 
 

@@ -127,6 +127,7 @@
 
                 <div class="modal-body p-5 pt-0">
                     <form method="post" action="/register" enctype="multipart/form-data">
+                        <input type="text" name="nickname" placeholder="Nickname" required class="form-control rounded-3" id="floatingInput2"><br>
                         <input type="email" name="email" placeholder="Email" required class="form-control rounded-3" id="floatingInput"><br>
                         <input class="form-control rounded-3" type="password" name="password" id="pass" placeholder="Password" required><br>
                         <input class="form-control rounded-3" type="password" name="confirm_password" id="repeat" placeholder="Confirm Password" required><br>
@@ -153,6 +154,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p id="valid2"></p>
                         <p id="valid"></p>
                         <input class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit", id="regbut", value="Register">
                     </form>
@@ -195,38 +197,51 @@ document.getElementById('file-upload').addEventListener('change', function() {
 });
 </script>
 <script>
+  let valid = document.getElementById("valid");
+  let pass = document.getElementById("pass");
+  let regbut = document.getElementById("regbut");
+  let repeat = document.getElementById("repeat");
+  let nickname = document.getElementById("floatingInput2"); // Получаем доступ к полю с никнеймом
 
-	let valid = document.getElementById("valid");
-	let pass = document.getElementById("pass");
-	let regbut = document.getElementById("regbut");
-	let repeat = document.getElementById("repeat");
+  regbut.setAttribute("disabled", "yes");
 
-	regbut.setAttribute("disabled", "yes");
+  // Проверка поля никнейм на изменение
+  nickname.addEventListener("input", (e) => {
+    if (!nickname.value) { // Если поле пустое
+      valid.innerHTML = "<span style=\"color:red;\">Введите никнейм.</span>";
+      regbut.setAttribute("disabled", "yes");
+    } else { // Если в поле что-то есть
+      valid.innerHTML = "<span style=\"color:green;\">Отличный никнейм!</span>";
+      // Проверяем, удовлетворяют ли пароли условиям, и применяем соответствующее действие
+      if (pass.value.length >= 8 && pass.value == repeat.value) {
+        regbut.removeAttribute("disabled");
+      }
+    }
+  });
 
-	pass.addEventListener("input",(e)=>{
-		if(pass.value.length < 8){
-			valid.innerHTML = "<span style=\"color:red;\">длина пароля должна составлять хотябы 8 символов</span>";
-			regbut.setAttribute("disabled", "yes");
-		} else if (pass.value == repeat.value){
-			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
-			regbut.removeAttribute("disabled");
-		} else {
-			valid.innerHTML = "";
-		}
-	});
-	repeat.addEventListener("input",(e)=>{
-		if(pass.value != repeat.value){
-			valid.innerHTML = "<span style=\"color:red;\">пароли не совпадают</span>";
-			regbut.setAttribute("disabled", "yes");
-		} else if (pass.value.length >= 8){
-			valid.innerHTML = "<span style=\"color:green;\">пароль подходит</span>";
-			regbut.removeAttribute("disabled");
-		}  else{
-			valid.innerHTML = "";
+  pass.addEventListener("input", (e) => {
+    if (pass.value.length < 8) {
+      valid.innerHTML = "<span style=\"color:red;\">Длина пароля должна составлять хотя бы 8 символов</span>";
+      regbut.setAttribute("disabled", "yes");
+    } else if (pass.value == repeat.value && nickname.value) {
+      valid.innerHTML = "<span style=\"color:green;\">Пароль подходит</span>";
+      regbut.removeAttribute("disabled");
+    } else {
+      valid.innerHTML = "";
+    }
+  });
 
-		}
-	});
-
+  repeat.addEventListener("input", (e) => {
+    if (pass.value != repeat.value) {
+      valid.innerHTML = "<span style=\"color:red;\">Пароли не совпадают</span>";
+      regbut.setAttribute("disabled", "yes");
+    } else if (pass.value.length >= 8 && nickname.value) {
+      valid.innerHTML = "<span style=\"color:green;\">Пароль подходит</span>";
+      regbut.removeAttribute("disabled");
+    } else {
+      valid.innerHTML = "";
+    }
+  });
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
