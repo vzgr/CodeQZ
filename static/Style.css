@@ -111,8 +111,13 @@ footer {
 
 .githublogo {
 
-width: 50px;
+width: 33px;
+height: 33px
 
+}
+.custom-hr {
+  border-top: 1px solid #ffffff; /* черная линия */
+  color: white
 }
 
 #theme-toggler {
