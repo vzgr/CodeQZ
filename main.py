@@ -11,7 +11,7 @@ from PIL import Image
 from art import *
 from colorama import Fore, Back, Style
 
-Art = text2art("CodeQZ",font='big',chr_ignore=True) # console logo
+Art = text2art("CodeCrunch",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
 print(Fore.LIGHTWHITE_EX)
 
@@ -300,4 +300,4 @@ def jstest():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=80, host="0.0.0.0")
+    app.run(debug=True, port=80, host="0.0.0.0")

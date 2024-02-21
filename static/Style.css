@@ -1,20 +1,20 @@
 @import "bootstrap";
 :root{
- --accent: #4caf50;
- --accent_pushed: #338a3e;
- --input-shadow: inset 0 1px 1px 1px rgba(255, 255, 255, 0.3), 0 2px 4px 0 rgba(0,0,0,.15), 0 1px 1.5px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.2), 0 0 0 0 transparent;
- --bs-sans-serif: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+	--accent: #4caf50;
+	--accent_pushed: #338a3e;
+	--input-shadow: inset 0 1px 1px 1px rgba(255, 255, 255, 0.3), 0 2px 4px 0 rgba(0,0,0,.15), 0 1px 1.5px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.2), 0 0 0 0 transparent;
+	--bs-sans-serif: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 }
 .row{
 	margin-left: auto;
 	margin-right: auto;
 }
 .col{
-	  display: flex;
-  align-content: center;
-  align-items: center;
-  flex-direction: column;
-  }
+	display: flex;
+	align-content: center;
+	align-items: center;
+	flex-direction: column;
+}
 .profile-avatar {
     border-radius: 50%;
     object-fit: cover;
@@ -22,65 +22,66 @@
     height: 150px;
 }
 body {
-		font-family: var(--bs-sans-serif);
-        margin: 0;
-        padding: 0;
-        background-color: #1b1d1e; /* светло-серый фон, Bootstrap-like */
-		min-height: 100vh;
-		display: grid;
-		grid-template-rows: auto 1fr auto;
-    }
-	.container{
-		color: white;
-	}
-    .header, .footer {
-        background-color: var(--accent); /* Зеленый фон */
-        color: white;
-        font-weight: bold; /* Делаем шрифт жирным */
-    }
-    .footer {
-        text-align: center;
-        width: 100%;
-    }
-	.navbar-toggler{
-		margin-top: 5rem;
-	}
-    .navbar .navbar-nav .nav-link {
-        color: white;
-    }
-    .navbar .navbar-nav .nav-link:hover {
-        text-decoration: underline;
-    }
+	font-family: var(--bs-sans-serif);
+    margin: 0;
+    padding: 0;
+    background-color: gray; /* светло-серый фон, Bootstrap-like */
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+}
+.container{
+	color: white;
+}
+header, footer {
+	background-color: rgb(27, 29, 30);
+    color: white;
+    font-weight: bold; /* Делаем шрифт жирным */
+}
+footer {
+	height: 7rem;
+	padding-top: 2rem;
+    text-align: center;
+    width: 100%;
+}
+.navbar-toggler{
+	margin-top: 5rem;
+}
+.navbar .navbar-nav .nav-link {
+    color: white;
+	border-radius: 0.5rem;
+	margin: 0 1rem 0 1rem;
+}
 
-    .navbar .navbar-nav .nav-link {
+.navbar .navbar-nav .nav-link {
     transition: transform 0.3s ease, background-color 0.3s ease; /* Добавляем плавность анимации */
 }
 
-    .navbar .navbar-nav .nav-link:hover {
+.navbar .navbar-nav .nav-link:hover {
     transform: scale(1.1); /* Увеличиваем размер */
     background-color: var(--accent_pushed); /* Изменяем цвет на более темный оттенок зеленого */
-    }
+}
 
     /* Анимации появления для контента */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+    to {
+        opacity: 1;
+        transform: translateY(0);
         }
-    }
+}
 
-    .fadeInUp {
-        animation-name: fadeInUp;
-        animation-duration: 1s;
-        animation-fill-mode: both;
-    }
-    .navbar-brand {
+.fadeInUp {
+    animation-name: fadeInUp;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+.navbar-brand {
     width: 100px;
-    }
+}
 
 .logotexto {
 

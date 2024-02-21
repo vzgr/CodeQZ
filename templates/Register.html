@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeQZ</title>
+<title>CodeCrunch</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
@@ -29,12 +29,12 @@
 <link rel="stylesheet" href="static/Style.css">
 
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <img src="{{ url_for('static', filename='images/Logo.png') }}" class="image navbar-brand", alt="Logo" />
                 <h1 class="logotexto inline">Code</h1>
-                <h1 class="logotexts inline">QZ</h1>
+                <h1 class="logotexts inline">Crunch</h1>
             </a>
             <script>
                 const appearance = (element, timeout) => { // убрал неиспользуемый параметр display
@@ -134,7 +134,7 @@
                         <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" hidden>
                         <!-- Скрытое текстовое поле для хранения данных обрезанного изображения -->
                         <input type="hidden" id="avatarBase64" name="avatarBase64">
-                        <button type="button" class="btn btn-primary btn-block mt-2" onclick="document.getElementById('avatar').click()">Загрузить аватар</button>
+                        <button type="button" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" onclick="document.getElementById('avatar').click()">Загрузить аватар</button>
                         <div id="cropImageModal" class="modal" tabindex="-1" role="dialog">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -181,7 +181,7 @@
     </div>
 </div>
 
-<footer class="footer bg-success py-3">
+<footer>
     <div class="container">
         <span>&copy; 2024 NExt team. <a href="https://github.com/vzgr/CodeQZ"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png", class="githublogo"></a></span>
     </div>
