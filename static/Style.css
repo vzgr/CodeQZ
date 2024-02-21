@@ -89,7 +89,7 @@ footer {
 	font-family: "MADE Soulmaze", Courier;
 	font-display: swap;
 	font-weight: 100;
-	color: #3b3b3b;
+	color: var(--accent) !important;
 
 }
 .about h1,.about p{
@@ -101,11 +101,11 @@ footer {
 }
 .logotexts {
 
-@import url('https://fonts.cdnfonts.com/css/made-soulmaze');
+@import url('h');
 	font-family: "MADE Soulmaze", Courier;
 	font-display: swap;
 	font-weight: 100;
-	color: #08ffb0
+	color: var(--accent) !important;
 
 }
 
@@ -172,6 +172,7 @@ height: 33px
 }
 
 .inline {
+	color: var(--accent);
     display: inline;
     margin-right: 5px; /* Вы можете отрегулировать это значение по своему усмотрению */
 }
