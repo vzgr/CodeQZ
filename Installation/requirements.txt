@@ -14,3 +14,4 @@ Werkzeug==3.0.1
 art==6.1
 colorama==0.4.6
 pillow==10.2.0
+Flask-Cors==4.0.0

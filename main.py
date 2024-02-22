@@ -10,6 +10,8 @@ from io import BytesIO
 from PIL import Image
 from art import *
 from colorama import Fore, Back, Style
+from flask_cors import CORS
+
 
 Art = text2art("CodeCrunch",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
@@ -18,6 +20,7 @@ print(Fore.LIGHTWHITE_EX)
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = '9991secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -166,7 +169,15 @@ def register():
     return render_template('Register.html')
 
 
-
+@app.route('/add_test_batch', methods=['POST'])
+def add_test():
+    data = request.get_json()
+    iteration = data['iteration']
+    testName = data.get('testName')  # Получаем название теста, если оно есть
+    print(f"Тест №{iteration} получен: {data}")
+    if testName:
+        print(f"Название теста: {testName}")
+    return jsonify({"message": f"Тест №{iteration} успешно добавлен."})
 
 @app.route('/')
 def mainpage():
@@ -279,7 +290,6 @@ def about():
 def tests():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
     return render_template('Tests.html', is_authenticated=is_authenticated)
-
 
 @app.route('/unitytest')
 def unitytest():
