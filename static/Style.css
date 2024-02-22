@@ -99,9 +99,6 @@ footer {
 	background-color: #222622;
 }
 .logotexts {
-
-@import url('h');
-	font-family: "MADE Soulmaze", Courier;
 	font-display: swap;
 	font-weight: 100;
 	color: var(--accent) !important;
