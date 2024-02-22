@@ -40,7 +40,6 @@ header, footer {
 }
 footer {
 	height: 7rem;
-	padding-top: 2rem;
     text-align: center;
     width: 100%;
 }
@@ -80,7 +79,7 @@ footer {
     animation-fill-mode: both;
 }
 .navbar-brand {
-    width: 100px;
+    width: 5rem;
 }
 
 .logotexto {
