@@ -25,10 +25,11 @@
 <link rel="stylesheet" href="static/Style.css">
 
 <header>
+    <!-- Bootstrap навигационная панель -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='images/Logo.svg') }}" class="image navbar-brand", alt="Logo" />
+                <img src="{{ url_for('static', filename='images/Logo.svg') }}" alt="Logo", class="navbar-brand">
                 <h1 class="logotexto inline">Code</h1>
                 <h1 class="logotexts inline">Crunch</h1>
             </a>
@@ -70,6 +71,7 @@
             </div>
         </div>
     </nav>
+    <hr class="custom-hr">
 </header>
 
 <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">

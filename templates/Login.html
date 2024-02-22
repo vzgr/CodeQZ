@@ -25,7 +25,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='images/Logo.svg') }}" class="image navbar-brand", alt="Logo" />
+                <img src="{{ url_for('static', filename='images/Logo.svg') }}" alt="Logo", class="navbar-brand">
                 <h1 class="logotexto inline">Code</h1>
                 <h1 class="logotexts inline">Crunch</h1>
             </a>
@@ -47,7 +47,6 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav ml-auto">
                     <a class="nav-link" href="/tests">Тесты<span class="sr-only">(current)</span></a>
@@ -58,10 +57,17 @@
                     {% else %}
                     <a class="nav-link" href="/profile">Профиль</a>
                     {% endif %}
+                    <button id="theme-toggler" class="nav-link btn btn-link" aria-label="Переключить тему" style="margin-top: auto; margin-bottom: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="icon-moon" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path d="M16 8a8 8 0 1 1-11.314-5.874 7.97 7.97 0 0 1 4.72 4.721A7 7 0 0 0 16 8z"/>
+                        </svg>
+                    </button>
                 </div>
+
             </div>
         </div>
     </nav>
+    <hr class="custom-hr">
 </header>
 
 <!-- Добавьте ваш контент здесь -->
