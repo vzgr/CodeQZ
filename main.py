@@ -100,7 +100,7 @@ def allowed_file(filename):
 
 def get_extension(filename):
     """
-    Возвращает расширение файла, начиная с последней точки.
+    Возвращает расширsение файла, начиная с последней точки.
 
     :param filename: Имя файла с возможным расширением.
     :return: Расширение файла с точкой или пустая строка, если расширение отсутствует.
@@ -188,19 +188,26 @@ def add_test():
     questions.append(question)
     optionsArray.extend(options)
 
-    def combine_strings(strings_list, delimiter="|"):
-        # Объединяем строки из списка, используя заданный разделитель
-        combined_string = delimiter.join(strings_list)
+    def combine_strings(strings_list, iteration, delimiter="|"):
+        # Добавляем номер итерации к каждой строке
+        combined_string = delimiter.join([f"{string}{i + 1}" for i, string in enumerate(strings_list)])
         return combined_string
+    def split_combined_string(combined_string, delimiter="|"):
+        # Разбиваем строку по разделителю
+        parts = combined_string.split(delimiter)
+        # Возвращаем список кортежей в формате (итерация, строка)
+        return [(part[-1], part[:-1]) for part in parts]
     if iteration == 2:
         # Предполагается, что у вас есть класс Test и функция для добавления в БД, которые здесь не описаны
         print(testName)
-        print(combine_strings(questions))
-        print(combine_strings(optionsArray))
-        # new_test = Test(testname=testName,
-        #                 question=combine_strings(questions),
-        #                 options=combine_strings(optionsArray),
-        #                 correctAnswer=selectedOption)
+        cmnq = combine_strings(questions, iteration)
+        optq = combine_strings(optionsArray, iteration)
+        slctdopt = combine_strings(selectedOption, iteration)
+
+        new_test = Test(testname=testName,
+                        question=cmnq,
+                        options=optq,
+                        correctAnswer=slctdopt)
         # Здесь должен быть код для сохранения объекта new_test в базу данных
         # Не забываем очистить глобальные переменные после сохранения
         questions.clear()
