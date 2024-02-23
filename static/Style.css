@@ -19,27 +19,27 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-        /* Применяем анимацию к модальному окну */
-        .modal-content {
-            animation: appear 1s ease-out forwards;
-        }
-        /* Подключим базовые стили для красивой формы */
-        .modal-content, .form-control, .btn-primary {
-            border-radius: .75rem; /* Закругленные углы */
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-        }
-        .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-        .modal-dialog {
-            max-width: 400px; /* Чуть сужаем форму для красоты */
-            margin: 50px auto; /* Выравниваем по центру */
-        }
+}
+/* Применяем анимацию к модальному окну */
+.modal-content {
+	animation: appear 1s ease-out forwards;
+}
+/* Подключим базовые стили для красивой формы */
+.modal-content, .form-control, .btn-primary {
+    border-radius: .75rem; /* Закругленные углы */
+}
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+.form-control:focus {
+	border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.modal-dialog {
+    max-width: 400px; /* Чуть сужаем форму для красоты */
+    margin: 50px auto; /* Выравниваем по центру */
+}
 
 .col{
 	display: flex;
