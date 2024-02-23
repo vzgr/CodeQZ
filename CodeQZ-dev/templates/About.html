@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeCrunch</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="static/Style.css">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+
+</head>
+<body class="light-theme">
+
+<header>
+    <!-- Bootstrap навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='images/Logo.svg') }}" alt="Logo", class="navbar-brand">
+            </a>
+            <script>
+                const appearance = (element, timeout) => { // убрал неиспользуемый параметр display
+                    element.style.opacity = '0';
+                    element.style.transition = `opacity ${timeout}s`; // исправил на шаблонную строку с обратными кавычками
+                    setTimeout(() => {
+                        element.style.opacity = '1';
+                    }, 10);
+                }
+                const brand1 = document.querySelector('.navbar-brand');
+                appearance(brand1, 2);
+                const brand2 = document.querySelector('.logotexto');
+                appearance(brand2, 2);
+                const brand3 = document.querySelector('.logotexts');
+                appearance(brand3, 2);
+            </script>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav ml-auto">
+                    <a class="nav-link" href="/tests">Тесты<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/about">О нас</a>
+                    {% if not is_authenticated %}
+                    <a class="nav-link" href="/register">Зарегистрироваться</a>
+                    <a class="nav-link" href="/login">Войти</a>
+                    {% else %}
+                    <a class="nav-link" href="/profile">Профиль</a>
+                    {% endif %}
+                    <button id="theme-toggler" class="nav-link btn btn-link" aria-label="Переключить тему" style="margin-top: auto; margin-bottom: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="icon-moon" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path fill-rule="evenodd" d="M11.354 8.354a3.5 3.5 0 1 1-4.708-4.708 5.5 5.5 0 1 0 4.708 4.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <hr class="custom-hr">
+</header>
+
+ <div class="container col-xxl-8 px-4 py-5">
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+		<div class="col-10 col-sm-8 col-lg-6"><div id="box">
+        <img src="{{ url_for('static', filename='images/Next team.svg') }}" class="pre d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy"></div>
+      </div>
+      <div class="col-lg-6 about">
+		  <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Мы</h1>
+        <p class="lead">команда разработчиков из Санкт-Петербурга, имеем опыт разработки сайтов и активно развиваемся дальше. Этот сайт мы создали для марафона умный Петербург, задача сайта в том, чтобы проходить опросы и тесты, повышая свои знания.</p>
+        </div>
+      </div>
+    </div>
+
+<footer>
+    <div class="container">
+        <hr class="custom-hr">
+        <span>&copy; 2024 NExt team. <a href="https://github.com/vzgr/CodeQZ"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png", class="githublogo"></a></span>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init();</script>
+<script>// scripts.js
+$(document).ready(function() {
+  $('.content-wrapper').fadeIn(1000);
+});
+</script>
+<style>
+
+img.pre{
+  transition: 0.1s;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(5000px) rotateY(var(--rotateX)) rotateX(var(--rotateY));
+}
+
+
+#box:not( :hover ){
+  img.pre{
+  transform: none;
+  transition: 1s;
+  }
+}
+
+
+</style>
+
+<script>
+	const pre = document.getElementsByClassName("pre")[0];
+
+document.getElementById("box").addEventListener("mousemove", (e) => {
+  rotateElement(e, pre);
+});
+
+function rotateElement(event, element) {
+  // get mouse position
+  const x = event.clientX -element.getBoundingClientRect().left;
+  const y = event.clientY -element.getBoundingClientRect().top;
+
+  // console.log(x, y)
+  //console.log(element.offset())
+  // find the middle
+  const middleX = element.getBoundingClientRect().width/2;
+  const middleY = element.getBoundingClientRect().height/2;
+  // console.log(middleX, middleY)
+  //console.log(middleX)
+
+  // get offset from middle as a percentage
+  // and tone it down a little
+  const offsetX = ((x - middleX) / middleX) * 20;
+  const offsetY = ((y - middleY) / middleY) * 20;
+  // console.log(offsetX, offsetY);
+
+  // set rotation
+  element.style.setProperty("--rotateX", offsetX + "deg");
+  element.style.setProperty("--rotateY", -1 * offsetY + "deg");
+}
+
+</script>
+<!-- Подключаем Bootstrap JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.1.9/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doMkKqN5JWi1toQdP5VTp0oGdjl5jBP4epzj1K9phqgwwHJT6/7P4ps" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
+<script src="static/JS/theme-switcher.js"></script>
+</body>
+</html>

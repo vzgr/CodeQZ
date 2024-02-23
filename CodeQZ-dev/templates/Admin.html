@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeCrunch</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="static/Style.css">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+
+
+
+</head>
+<body>
+
+<link rel="stylesheet" href="static/Style.css">
+
+<header>
+    <!-- Bootstrap навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='images/Logo.svg') }}" alt="Logo", class="navbar-brand">
+            </a>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const elementAppear = (element, timeout) => {
+                        // Исправил ошибку синтаксиса шаблонной строки и обращением к стилю
+                        element.style.opacity = '0';
+                        element.style.transition = `opacity ${timeout}s`; // Исправил шаблонную строку
+                        setTimeout(() => {
+                            element.style.opacity = '1';
+                        }, 10);
+                    };
+                    const brand1 = document.querySelector('.navbar-brand');
+                    elementAppear(brand1, 2);
+                    const brand2 = document.querySelector('.logotexto');
+                    elementAppear(brand2, 2);
+                    const brand3 = document.querySelector('.logotexts');
+                    elementAppear(brand3, 2);
+                });
+            </script>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav ml-auto">
+                    <a class="nav-link" href="/tests">Тесты<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/about">О нас</a>
+                    {% if not is_authenticated %}
+                    <a class="nav-link" href="/register">Зарегистрироваться</a>
+                    <a class="nav-link" href="/login">Войти</a>
+                    {% else %}
+                    <a class="nav-link" href="/profile">Профиль</a>
+                    {% endif %}
+                    <button id="theme-toggler" class="nav-link btn btn-link" aria-label="Переключить тему" style="margin-top: auto; margin-bottom: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="icon-moon" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path fill-rule="evenodd" d="M11.354 8.354a3.5 3.5 0 1 1-4.708-4.708 5.5 5.5 0 1 0 4.708 4.708z"/>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <hr class="custom-hr">
+</header>
+
+<div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
+    <div class="modal-dialog" role="document", id="register">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2" style="font-size: 1.5rem;">Welcome to the admin panel!</h1>
+            </div>
+
+            <div class="modal-body p-5 pt-0">
+                <button type="button" class="btn btn-primary btn-block mt-2", id = "loadMenuButton">Write a new test</button>
+                <div id="menuContainer"></div>
+            </div>
+    </div>
+</div>
+</div>
+
+
+
+<footer>
+    <div class="container">
+        <hr class="custom-hr">
+        <span>&copy; 2024 NExt team. <a href="https://github.com/vzgr/CodeQZ"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png", class="githublogo"></a></span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init();</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    console.log("Документ загружен. Обработчик готов.");
+    let testNameSent = false; // Флаг для проверки, было ли название теста отправлено
+    let submissionCount = 0;
+    let savedTestName = ""; // Добавлена переменная для хранения имени теста после его первой отправки
+
+    function createAndShowForm() {
+        if (submissionCount >= 2) {
+            window.location.href = "/";
+            return;
+        }
+
+        console.log("Кнопка #loadMenuButton нажата.");
+        $("#loadMenuButton").hide();
+
+        var menuContent = `
+            <input class="form-control rounded-3 testNameInput" type="text" placeholder="Test Name" ${testNameSent ? 'disabled value="' + savedTestName + '"' : ''}><br>
+            <input class="form-control rounded-3 questionInput" type="text" placeholder="Question" required><br>
+            <div class="container mt-5">
+            <form id="testForm">`;
+
+        for (let i = 1; i <= 5; i++) {
+            menuContent += `
+                <div class="row align-items-center mb-3">
+                    <div class="col-auto">
+                        <input class="form-check-input" type="radio" name="radioOptions" required value="Option ${i}">
+                    </div>
+                    <div class="col">
+                        <input class="form-control rounded-3 option-input" type="text" placeholder="Option ${i}" required>
+                    </div>
+                </div>
+            `;
+        }
+
+        menuContent += `</div><p id="valid"></p><button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" id="regbut">Add test</button></form>`;
+
+        $("#menuContainer").html(menuContent);
+
+        if (testNameSent) {
+            $('.testNameInput').prop('disabled', true); // Убедиться, что поле с названием теста заблокировано после первой отправки
+        }
+
+        $('#regbut').on("click", function(event){
+            event.preventDefault();
+
+            let isFormValid = $('#testForm')[0].checkValidity();
+
+            if(!isFormValid) {
+                alert("Please, fill all fields and select at least one option.");
+                return;
+            }
+
+            if (!testNameSent) {
+                savedTestName = $('.testNameInput').val(); // Сохраняем имя теста после его первой отправки
+            }
+
+            let questionData = {
+                testName: savedTestName, // Используем сохраненное имя теста
+                question: $('.questionInput').val(),
+                options: [],
+                selectedOption: $('input[type="radio"]:checked').val(),
+                iteration: submissionCount + 1
+            };
+
+            if (!testNameSent && savedTestName) {
+                testNameSent = true; // Отмечаем, что название теста отправлено
+            }
+
+            $('.option-input').each(function() {
+                questionData.options.push($(this).val());
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/add_test_batch",
+                contentType: "application/json",
+                data: JSON.stringify(questionData),
+                success: function(response){
+                    alert(response.message);
+                    submissionCount++;
+                    $('.testNameInput').prop('disabled', true); // Заблокировать поле после отправки данных
+                    $("#testForm").trigger("reset");
+                    createAndShowForm();
+                },
+                error: function(response) {
+                    alert("Ошибка при загрузке теста");
+                }
+            });
+        });
+    }
+
+    $("#loadMenuButton").click(createAndShowForm);
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
+<script src="static/JS/theme-switcher.js"></script>
+</body>
+</html>
