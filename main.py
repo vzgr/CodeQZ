@@ -26,6 +26,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+questions = []
+optionsArray = []
 db = SQLAlchemy(app)
 first_request_initialized = False
 
@@ -171,13 +173,42 @@ def register():
 
 @app.route('/add_test_batch', methods=['POST'])
 def add_test():
+    global questions, optionsArray
+
     data = request.get_json()
     iteration = data['iteration']
-    testName = data.get('testName')  # Получаем название теста, если оно есть
-    print(f"Тест №{iteration} получен: {data}")
-    if testName:
-        print(f"Название теста: {testName}")
-    return jsonify({"message": f"Тест №{iteration} успешно добавлен."})
+    testName = data.get('testName')
+    question = data.get('question')
+    options = data.get('options')
+    selectedOption = data.get('selectedOption')
+
+    questions.append(question)
+    optionsArray.extend(options)
+
+    def combine_strings(strings_list, delimiter="|"):
+        # Объединяем строки из списка, используя заданный разделитель
+        combined_string = delimiter.join(strings_list)
+        return combined_string
+    if iteration == 2:
+        # Предполагается, что у вас есть класс Test и функция для добавления в БД, которые здесь не описаны
+        print(testName)
+        print(combine_strings(questions))
+        print(combine_strings(optionsArray))
+        # new_test = Test(testname=testName,
+        #                 question=combine_strings(questions),
+        #                 options=combine_strings(optionsArray),
+        #                 correctAnswer=selectedOption)
+        # Здесь должен быть код для сохранения объекта new_test в базу данных
+        # Не забываем очистить глобальные переменные после сохранения
+        questions.clear()
+        optionsArray.clear()
+
+        return jsonify({"message": f"Тест '{testName}' успешно добавлен."})
+
+    # Если iteration не равен 10, возвращаем сообщение о текущем статусе
+    return jsonify({"message": f"Тест №{iteration} успешно принят, накопление данных..."})
+
+
 
 @app.route('/')
 def mainpage():

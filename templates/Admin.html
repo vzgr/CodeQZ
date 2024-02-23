@@ -111,9 +111,10 @@ $(document).ready(function(){
     console.log("Документ загружен. Обработчик готов.");
     let testNameSent = false; // Флаг для проверки, было ли название теста отправлено
     let submissionCount = 0;
+    let savedTestName = ""; // Добавлена переменная для хранения имени теста после его первой отправки
 
     function createAndShowForm() {
-        if (submissionCount >= 10) {
+        if (submissionCount >= 2) {
             window.location.href = "/";
             return;
         }
@@ -122,10 +123,10 @@ $(document).ready(function(){
         $("#loadMenuButton").hide();
 
         var menuContent = `
-        <input class="form-control rounded-3 testNameInput" type="text" placeholder="Test Name" ${testNameSent ? 'disabled value="' + $('.testNameInput').val() + '"' : ''}><br>
-        <input class="form-control rounded-3 questionInput" type="text" placeholder="Question" required><br>
-        <div class="container mt-5">
-        <form id="testForm">`;
+            <input class="form-control rounded-3 testNameInput" type="text" placeholder="Test Name" ${testNameSent ? 'disabled value="' + savedTestName + '"' : ''}><br>
+            <input class="form-control rounded-3 questionInput" type="text" placeholder="Question" required><br>
+            <div class="container mt-5">
+            <form id="testForm">`;
 
         for (let i = 1; i <= 5; i++) {
             menuContent += `
@@ -158,15 +159,19 @@ $(document).ready(function(){
                 return;
             }
 
+            if (!testNameSent) {
+                savedTestName = $('.testNameInput').val(); // Сохраняем имя теста после его первой отправки
+            }
+
             let questionData = {
-                testName: testNameSent ? null : $('.testNameInput').val(),
+                testName: savedTestName, // Используем сохраненное имя теста
                 question: $('.questionInput').val(),
                 options: [],
                 selectedOption: $('input[type="radio"]:checked').val(),
                 iteration: submissionCount + 1
             };
 
-            if (!testNameSent && questionData.testName) {
+            if (!testNameSent && savedTestName) {
                 testNameSent = true; // Отмечаем, что название теста отправлено
             }
 
