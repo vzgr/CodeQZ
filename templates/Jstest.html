@@ -75,7 +75,34 @@
     </nav>
     <hr class="custom-hr">
 </header>
-
+<style>
+    @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Применяем анимацию к модальному окну */
+        .modal-content {
+            animation: appear 1s ease-out forwards;
+        }
+        /* Подключим базовые стили для красивой формы */
+        .modal-content, .form-control, .btn-primary {
+            border-radius: .75rem; /* Закругленные углы */
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .modal-dialog {
+            max-width: 400px; /* Чуть сужаем форму для красоты */
+            margin: 50px auto; /* Выравниваем по центру */
+        }
+</style>
 
 <div id="confrim">
 <div class="modal modal-sheet d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSheet">
