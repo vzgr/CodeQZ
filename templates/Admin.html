@@ -109,7 +109,7 @@
             max-width: 400px; /* Чуть сужаем форму для красоты */
             margin: 50px auto; /* Выравниваем по центру */
         }
-</style>    
+</style>
 <div class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabindex="-1" role="dialog" id="modalSignin">
     <div class="modal-dialog" role="document", id="register">
         <div class="modal-content rounded-4 shadow">
@@ -141,8 +141,10 @@
 $(document).ready(function(){
     console.log("Документ загружен. Обработчик готов.");
     let testNameSent = false; // Флаг для проверки, было ли название теста отправлено
+    let testDescriptionSent = false; // Флаг для проверки, было ли описание теста отправлено
     let submissionCount = 0;
     let savedTestName = ""; // Добавлена переменная для хранения имени теста после его первой отправки
+    let savedTestDescription = ""; // Добавлена переменная для хранения описания теста после его первой отправки
 
     function createAndShowForm() {
         if (submissionCount >= 2) {
@@ -155,6 +157,7 @@ $(document).ready(function(){
 
         var menuContent = `
             <input class="form-control rounded-3 testNameInput" type="text" placeholder="Test Name" ${testNameSent ? 'disabled value="' + savedTestName + '"' : ''}><br>
+            <input class="form-control rounded-3 testDescriptionInput" type="text" placeholder="Test Description" ${testDescriptionSent ? 'disabled value="' + savedTestDescription + '"' : ''}><br>
             <input class="form-control rounded-3 questionInput" type="text" placeholder="Question" required><br>
             <div class="container mt-5">
             <form id="testForm">`;
@@ -173,11 +176,14 @@ $(document).ready(function(){
         }
 
         menuContent += `</div><p id="valid"></p><button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" id="regbut">Add test</button></form>`;
-
         $("#menuContainer").html(menuContent);
 
         if (testNameSent) {
-            $('.testNameInput').prop('disabled', true); // Убедиться, что поле с названием теста заблокировано после первой отправки
+            $('.testNameInput').prop('disabled', true);
+        }
+
+        if (testDescriptionSent) {
+            $('.testDescriptionInput').prop('disabled', true);
         }
 
         $('#regbut').on("click", function(event){
@@ -191,41 +197,64 @@ $(document).ready(function(){
             }
 
             if (!testNameSent) {
-                savedTestName = $('.testNameInput').val(); // Сохраняем имя теста после его первой отправки
+                savedTestName = $('.testNameInput').val();
             }
 
+            if (!testDescriptionSent) {
+                savedTestDescription = $('.testDescriptionInput').val();
+            }
+
+            let selectedOptionValue = $('input[type="radio"]:checked').val(); // Получаем значение выбранного варианта (например, "Option 5")
+            let selectedOptionIndex = parseInt(selectedOptionValue.split(" ")[1], 10); // Разделяем строку и преобразуем второй элемент в число
+
+            // Обновление questionData с новым selectedOption
             let questionData = {
-                testName: savedTestName, // Используем сохраненное имя теста
+                testName: savedTestName,
+                testDescription: savedTestDescription,
                 question: $('.questionInput').val(),
                 options: [],
-                selectedOption: $('input[type="radio"]:checked').val(),
+                selectedOption: selectedOptionIndex, // Используем числовое значение
                 iteration: submissionCount + 1
             };
-
-            if (!testNameSent && savedTestName) {
-                testNameSent = true; // Отмечаем, что название теста отправлено
-            }
 
             $('.option-input').each(function() {
                 questionData.options.push($(this).val());
             });
 
+            if (!testNameSent && savedTestName) {
+                testNameSent = true;
+            }
+
+            if (!testDescriptionSent && savedTestDescription) {
+                testDescriptionSent = true;
+            }
+
+
             $.ajax({
-                type: "POST",
-                url: "/add_test_batch",
-                contentType: "application/json",
+                url: '/add_question_with_answers', // Укажите URL, соответствующий вашему API для обработки вопросов и ответов
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(questionData),
-                success: function(response){
-                    alert(response.message);
+                dataType: 'json',
+                success: function(response) {
+                    console.log("Успешно отправлено и обработано", response);
+                    // Обработка успешной отправки данных, например, очистка формы или сообщение пользователю
+                    alert("Your test question and options have been successfully submitted!");
                     submissionCount++;
-                    $('.testNameInput').prop('disabled', true); // Заблокировать поле после отправки данных
-                    $("#testForm").trigger("reset");
-                    createAndShowForm();
+                    createAndShowForm(); // Пересоздание формы для следующего вопроса если требуется
                 },
-                error: function(response) {
-                    alert("Ошибка при загрузке теста");
+                error: function(xhr, status, error) {
+                    // Обработка ошибок, например, если сервер вернул статус ошибки
+                    console.error("Ошибка отправки данных: ", status, error);
+                    alert("Error: " + xhr.responseText); // Отображение ошибки от сервера
                 }
             });
+
+            if (testNameSent) {
+                testNameSent = false; // Сброс, если вам нужно пройти процесс сначала после отправки данных
+                testDescriptionSent = false; // Сброс, если вам нужно пройти процесс сначала после отправки данных
+            }
+            createAndShowForm();
         });
     }
 

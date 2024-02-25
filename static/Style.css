@@ -10,7 +10,39 @@
 	margin-right: auto;
 }
 
+.btn-custom-mp {
+  font-size: 2em; /* Adjust size as needed */
+  padding: 20px 40px; /* Larger padding for bigger button appearance */
+  color: white; /* White text color */
+  background: #333; /* Dark background for the button */
+  border: 2px solid #555; /* Slightly lighter border */
+  border-radius: 25px; /* Rounded corners */
+  text-decoration: none; /* Remove underline from links */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  display: inline-block; /* Necessary for correct spacing */
+  position: relative; /* For pseudo-elements positioning */
+}
 
+.btn-custom-mp:hover {
+  background: #444; /* Slightly lighter background on hover */
+  border-color: #777; /* Lighter border on hover */
+  color: #FFF; /* Keep text color the same, but can be changed if needed */
+}
+
+.btn-custom-mp:hover::after {
+  content: '>'; /* Symbol adjusted as needed */
+  color: white; /* Same color as the text */
+  font-size: 0.5em; /* Adjust the font size of the symbol to make it smaller */
+  position: absolute; /* Positioning relative to the button */
+  right: 20px; /* Distance from the right edge */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust vertical alignment of the smaller symbol */
+  transition: right 0.3s ease; /* Smooth transition for the arrow */
+}
+
+.btn-custom-mp:active {
+  transform: translateY(2px); /* Simulate button press */
+}
 
 .col{
 	display: flex;

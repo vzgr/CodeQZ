@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session, redirect, url_for, render_te
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
+from flask_marshmallow import Marshmallow
 from werkzeug.utils import secure_filename
 import os
 from flask import send_from_directory
@@ -9,25 +10,24 @@ import base64
 from io import BytesIO
 from PIL import Image
 from art import *
-from colorama import Fore, Back, Style
+from colorama import Fore
 from flask_cors import CORS
-
 
 Art = text2art("CodeCrunch",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
 print(Fore.LIGHTWHITE_EX)
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 CORS(app)
+ma = Marshmallow(app)
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['SECRET_KEY'] = '9991secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-questions = []
-optionsArray = []
+app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 first_request_initialized = False
 @app.route('/favicon.ico')
@@ -41,6 +41,7 @@ def before_request():
     if not first_request_initialized:
         db.create_all()
         first_request_initialized = True
+
 
 
 class Base64Image:
@@ -90,13 +91,25 @@ class User(db.Model):
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    testname = db.Column(db.String, nullable=False)
-    question = db.Column(db.String, nullable=False)
-    options = db.Column(db.String, nullable=False)
-    correctAnswer = db.Column(db.String, nullable=False)
+    testname = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    questions = db.relationship('Question', backref='test', lazy=True)
+
+class Question(db.Model):
+    question_id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    question_text = db.Column(db.String(120), nullable=False)
+    answers = db.relationship('Answer', backref='question', lazy=True)
+
+class Answer(db.Model):
+    answer_id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
+    answer_text = db.Column(db.String(120), nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 def get_extension(filename):
     """
@@ -174,51 +187,40 @@ def register():
     return render_template('Register.html')
 
 
-@app.route('/add_test_batch', methods=['POST'])
-def add_test():
-    global questions, optionsArray
+@app.route('/add_question_with_answers', methods=['POST'])
+def add_question_with_answers():
+    data = request.json
+    print("Received data:", data)
 
-    data = request.get_json()
-    iteration = data['iteration']
-    testName = data.get('testName')
-    question = data.get('question')
-    options = data.get('options')
-    selectedOption = data.get('selectedOption')
+    test = Test.query.filter_by(testname=data.get('testName')).first()
+    if not test:
+        test = Test(testname=data.get('testName'), description=data.get('testDescription'))
+        db.session.add(test)
 
-    questions.append(question)
-    optionsArray.extend(options)
-
-    def combine_strings(strings_list, iteration, delimiter="|"):
-        # Добавляем номер итерации к каждой строке
-        combined_string = delimiter.join([f"{string}{i + 1}" for i, string in enumerate(strings_list)])
-        return combined_string
-    def split_combined_string(combined_string, delimiter="|"):
-        # Разбиваем строку по разделителю
-        parts = combined_string.split(delimiter)
-        # Возвращаем список кортежей в формате (итерация, строка)
-        return [(part[-1], part[:-1]) for part in parts]
-    if iteration == 2:
-        # Предполагается, что у вас есть класс Test и функция для добавления в БД, которые здесь не описаны
-        print(testName)
-        cmnq = combine_strings(questions, iteration)
-        optq = combine_strings(optionsArray, iteration)
-        slctdopt = combine_strings(selectedOption, iteration)
-
-        new_test = Test(testname=testName,
-                        question=cmnq,
-                        options=optq,
-                        correctAnswer=slctdopt)
-        # Здесь должен быть код для сохранения объекта new_test в базу данных
-        # Не забываем очистить глобальные переменные после сохранения
-        questions.clear()
-        optionsArray.clear()
-
-        return jsonify({"message": f"Тест '{testName}' успешно добавлен."})
-
-    # Если iteration не равен 10, возвращаем сообщение о текущем статусе
-    return jsonify({"message": f"Тест №{iteration} успешно принят, накопление данных..."})
+    question = Question(
+        test_id=test.id,
+        question_text=data.get('question')
+    )
+    db.session.add(question)
+    db.session.flush()
 
 
+    for idx, option in enumerate(data.get('options', [])):
+        is_correct = idx == (data.get('selectedOption') - 1)
+        answer = Answer(
+            question_id=question.question_id,
+            answer_text=option,
+            is_correct=is_correct
+        )
+        db.session.add(answer)
+
+
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "message": "Question and its answers were saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Database error occurred", "message": str(e)}), 500
 
 @app.route('/')
 def mainpage():
@@ -257,22 +259,17 @@ def process():
     page = data.get('page')
     variable = data.get('variable')
 
-    if not page or variable is None:
-        return jsonify({"error": "Missing 'page' or 'variable' data"}), 400
+    if not page or variable is None: return jsonify({"error": "Missing 'page' or 'variable' data"}), 400
 
     if hasattr(User, page):
         user = db.session.get(User, user_id)
         if user:
             setattr(user, page, variable)
             db.session.commit()
-
             return jsonify({"success": f"Column {page} updated with value {variable} for user {user_id}."})
-        else:
 
-
-            return jsonify({"error": "User not found"}), 404
-    else:
-        return jsonify({"error": f"Column {page} does not exist in User model"}), 400
+        else: return jsonify({"error": "User not found"}), 404
+    else: return jsonify({"error": f"Column {page} does not exist in User model"}), 400
 
 
 @app.route('/uploads/<filename>')
