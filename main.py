@@ -153,8 +153,6 @@ def register():
         db.session.commit()
         session['user_id'] = new_user.id
 
-
-
         base64_string = request.form['avatarBase64']
 
         if not base64_string:
@@ -323,11 +321,19 @@ def about():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
     return render_template('About.html', is_authenticated=is_authenticated)
 
-
 @app.route('/tests')
 def tests():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Tests.html', is_authenticated=is_authenticated)
+    return render_template('Tests.html')
+@app.route('/api/tests')
+def get_tests():
+    tests = Test.query.all()
+    return jsonify([{'id': test.id, 'testname': test.testname, 'description': test.description} for test in tests])
+
+@app.route('/api/test/<int:test_id>')
+def get_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    questions = [{'question_text': question.question_text, 'answers': [{'answer_text': answer.answer_text, 'is_correct': answer.is_correct} for answer in question.answers]} for question in test.questions]
+    return jsonify({'testname': test.testname, 'description': test.description, 'questions': questions})
 
 @app.route('/unitytest')
 def unitytest():

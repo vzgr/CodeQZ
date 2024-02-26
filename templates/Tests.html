@@ -9,10 +9,7 @@
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link href="../Css/Style.css" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/made-soulmaze" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -75,42 +72,22 @@
     </nav>
     <hr class="custom-hr">
 </header>
+<style>
+    p, li, a {
+    color: #fff; /* White */
+}
 
-<section>
-    <div class="container text-center">
-        <div class="row">
-            <div class="col">
-                <div class="card" style="width: 18rem; margin-top: 5em; background-color:#222622;">
-                    <div class="card-body">
-                        <h5 class="card-title teststext">Тест по JS</h5>
-                        <p class="card-text teststext">Как создатель теста по JavaScript, я сделал акцент на всесторонней проверке знаний, включая основы языка, DOM манипуляции, событийную модель и асинхронное программирование. Тест включает сценарии с использованием ES6+ синтаксиса и фреймворков, таких как React и Node.js, оценивая умение кандидатов адаптироваться к современным тенденциям веб-разработки. Он разработан для того, чтобы выявить глубокое понимание и практические навыки решения задач. Плюсы теста заключаются в его комплексном подходе и актуальности, а также в акценте на реальном кодировании и решении задач, что делает его идеальным для оценки кандидатов.</p>
-                        <a href="/jstest" class="btn btn-primary">Пройти тест</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width: 18rem; margin-top: 5rem; background-color:#222622;">
+/* Исправим цвет текста для навигационной панели и элементов списка */
+.navbar, .navbar a, .list-group-item {
+    color: #000; /* Black или любой другой цвет, который вы хотите использовать */
+}
 
-                    <div class="card-body">
-                        <h5 class="card-title teststext">Тест по PYTHON</h5>
-                        <p class="card-text teststext">Как разработчик теста по Python, я создал инструмент, покрывающий широкий спектр тем: от базового синтаксиса и структур данных до продвинутых концептов, таких как ООП, декораторы и асинхронное программирование. Тест структурирован для измерения понимания языка на различных уровнях и включает задачи на реальное кодирование, что выделяет его на фоне стандартных выборочных вопросов. Особенно ценно, что тест нацелен на оценку способности к проблемному анализу и эффективному решению задач, что делает его необходимым ресурсом для идентификации квалифицированных специалистов Python.</p>
-                        <a href="/pytest" class="btn btn-primary">Пройти тест</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width: 18rem; margin-top: 5rem;margin-bottom: 5rem; background-color:#222622;">
+</style>
+<div class="container">
+    <div id="tests-list" class="row"></div> <!-- Место для списка тестов -->
+    <div id="test-questions" class="row"></div> <!-- Место для вопросов теста -->
+</div>
 
-                    <div class="card-body">
-                        <h5 class="card-title teststext">Тест по UNITY</h5>
-                        <p class="card-text teststext">Как разработчик теста по Unity, я сфокусировался на оценке практических навыков: работа с ассетами, скриптами, UI и физикой. Тест охватывает ключевые концепции, необходимые для успешного создания игр: от простой анимации до сложных интеграций с системами AI. Преимуществами теста являются его актуальность, обширное покрытие материала и баланс между теорией и практикой. Это даст возможность работодателям точно оценить способности претендентов, а разработчикам — выявить зоны для роста. Созданный с учетом последних обновлений Unity, тест следует трендам индустрии и гарантирует релевантность оценки компетенций.</p>
-                        <a href="/unitytest" class="btn btn-primary">Пройти тест</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <footer>
     <div class="container">
@@ -120,9 +97,64 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.1/dist/aos.js"></script>
 <script>AOS.init();</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        loadTests();
 
+        // Функция для загрузки списка тестов
+        function loadTests() {
+            $.ajax({
+                url: '/api/tests', // Убедитесь, что этот URL корректен
+                type: 'GET',
+                success: function(tests) {
+                    let content = '<ul class="list-group">';
+                    tests.forEach(function(test) {
+                        // Обратите внимание на использование шаблонных строк
+                        content += `<li class="list-group-item test-item" onclick="loadTestQuestions(${test.id})">${test.testname}</li>`;
+                    });
+                    content += '</ul>';
+                    $('#tests-list').html(content); // Устанавливаем содержимое динамически
+                }
+            });
+        }
+
+        window.loadTestQuestions = function(test_id) {
+            $.ajax({
+                url: '/api/test/' + test_id, // Убедитесь, что этот URL корректен
+                type: 'GET',
+                success: function(test) {
+                    let content = `<h3>${test.testname}</h3><p>${test.description}</p><div>`;
+                    test.questions.forEach(function(question, questionIndex) {
+                        content += `<p>${question.question_text}</p><ul>`;
+                        question.answers.forEach(function(answer, answerIndex) {
+                            // Добавление радиокнопок
+                            content += `<li>
+                                        <input type="radio" name="question${questionIndex}" id="question${questionIndex}answer${answerIndex}" value="${answer.is_correct}">
+                                        <label for="question${questionIndex}answer${answerIndex}">
+                                            ${answer.answer_text}
+                                        </label>
+                                    </li>`;
+                        });
+                        content += '</ul><button onclick="checkAnswer(${questionIndex})">Проверить</button>';
+                    });
+                    content += '</div>';
+                    $('#test-questions').html(content); // Устанавливаем содержимое динамически
+                }
+            });
+        };
+
+        window.checkAnswer = function(questionIndex) {
+            const selectedAnswer = $(`input[name='question${questionIndex}']:checked`).val();
+            if(selectedAnswer === 'true') {
+                alert('Правильно!');
+            } else {
+                alert('Неправильно. Попробуйте снова.');
+            }
+        };
+    });
+</script>
 <!-- Подключаем Bootstrap JavaScript -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.1.9/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doMkKqN5JWi1toQdP5VTp0oGdjl5jBP4epzj1K9phqgwwHJT6/7P4ps" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+JS80GB+8llPCS7lxIHE2eN4HaojKE3agorz" crossorigin="anonymous"></script>
 <script src="static/JS/theme-switcher.js"></script>
