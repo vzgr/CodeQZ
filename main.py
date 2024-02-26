@@ -194,24 +194,23 @@ def add_question_with_answers():
     if not test:
         test = Test(testname=data.get('testName'), description=data.get('testDescription'))
         db.session.add(test)
+        db.session.flush()  # Предварительно сохраняем объект test, чтобы получить его id
 
     question = Question(
-        test_id=test.id,
+        test_id=test.id,  # Теперь здесь используется актуальный test.id
         question_text=data.get('question')
     )
     db.session.add(question)
-    db.session.flush()
-
+    db.session.flush()  # Опционально: вы можете сразу применить flush, чтобы и question получил id.
 
     for idx, option in enumerate(data.get('options', [])):
         is_correct = idx == (data.get('selectedOption') - 1)
         answer = Answer(
-            question_id=question.question_id,
+            question_id=question.question_id,  # Убедитесь, что здесь используется правильный атрибут для внешнего ключа
             answer_text=option,
             is_correct=is_correct
         )
         db.session.add(answer)
-
 
     try:
         db.session.commit()
@@ -219,7 +218,6 @@ def add_question_with_answers():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Database error occurred", "message": str(e)}), 500
-
 @app.route('/')
 def mainpage():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
