@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Тест</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Получение ID теста из URL
+    var testId = new URLSearchParams(window.location.search).get('test_id');
+    if (testId) {
+        $.getJSON(`/api/test/${testId}`, function(data) {
+            $('#testName').text(data.testname);
+            $('#testDescription').text(data.description);
+            data.questions.forEach(function(question, index) {
+                $('#questions').append(`<div><b>Вопрос ${index + 1}:</b> ${question.question_text}</div>`);
+                question.answers.forEach(function(answer){
+                    $('#questions').append(`<input type="radio" name="question${index}" value="${answer.answer_text}"> ${answer.answer_text}<br>`);
+                });
+            });
+        });
+    }
+});
+</script>
+</head>
+<body>
+<h1 id="testName">Загрузка названия теста...</h1>
+<p id="testDescription">Загрузка описания...</p>
+<div id="questions"></div>
+</body>
+</html>

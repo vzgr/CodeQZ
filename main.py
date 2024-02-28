@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask import Flask, request, jsonify, session, redirect, url_for, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -212,6 +213,7 @@ def add_question_with_answers():
         )
         db.session.add(answer)
 
+
     try:
         db.session.commit()
         return jsonify({"success": True, "message": "Question and its answers were saved successfully"}), 200
@@ -242,7 +244,6 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
-
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -321,7 +322,8 @@ def about():
 
 @app.route('/tests')
 def tests():
-    return render_template('Tests.html')
+    tests = Test.query.all()
+    return render_template('Tests.html', tests=tests)
 @app.route('/api/tests')
 def get_tests():
     tests = Test.query.all()
@@ -333,22 +335,9 @@ def get_test(test_id):
     questions = [{'question_text': question.question_text, 'answers': [{'answer_text': answer.answer_text, 'is_correct': answer.is_correct} for answer in question.answers]} for question in test.questions]
     return jsonify({'testname': test.testname, 'description': test.description, 'questions': questions})
 
-@app.route('/unitytest')
-def unitytest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Unitytest.html', is_authenticated=is_authenticated)
-
-
-@app.route('/pytest')
-def pytest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Pytest.html', is_authenticated=is_authenticated)
-
-
-@app.route('/jstest')
-def jstest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Jstest.html', is_authenticated=is_authenticated)
+@app.route('/test_page')
+def test_page():
+    return render_template('test_page.html')
 
 
 if __name__ == '__main__':
