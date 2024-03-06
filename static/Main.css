@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'Gotham';
+    src: url('./gotham.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+header{
+	background-image: url("./images/headerbg.jpg");
+	background-position: center;
+	background-size: cover;
+	box-shadow: 0 14rem 5rem 0px inset #000000ee;
+}
+
+header,section h1,section h3{
+	font-family: Gotham;
+}
+
+.navbar-brand img{
+	height: 5rem;
+}
+
+body{
+	background-color: #222426;
+}

@@ -90,7 +90,7 @@
          sodipodi:type="rect"
          d="M 30.535078,-1.4576465e-5 H 91.211842 A 35.807454,35.807454 45 0 1 127.0193,35.807439 V 96.484203 A 35.807454,35.807454 135 0 1 91.211842,132.29166 H 30.535078 A 35.807454,35.807454 45 0 1 -5.2723761,96.484203 V 35.807439 A 35.807454,35.807454 135 0 1 30.535078,-1.4576465e-5 Z" />
       <circle
-         style="display:none;fill:#4caf50;fill-opacity:1;stroke-width:0.264583"
+         style="display:none;fill:#0d6efd;fill-opacity:1;stroke-width:0.264583"
          id="path13"
          cx="97.045952"
          cy="29.973326"
@@ -134,7 +134,7 @@
          style="display:inline;fill:#ffffff;stroke-width:0.189253"
          id="path2" />
       <circle
-         style="display:inline;fill:#4caf50;fill-opacity:1;stroke-width:0.284838"
+         style="display:inline;fill:#0d6efd;fill-opacity:1;stroke-width:0.284838"
          id="circle2"
          cx="195.17438"
          cy="74.241051"
@@ -185,7 +185,7 @@
          style="display:inline;fill:#fcfcfc;fill-opacity:1;stroke:none;stroke-width:0.0546405;stroke-opacity:1"
          id="path10" />
       <circle
-         style="display:inline;fill:#4caf50;fill-opacity:1;stroke-width:0.401748"
+         style="display:inline;fill:#0d6efd;fill-opacity:1;stroke-width:0.401748"
          id="circle7"
          cx="196.08682"
          cy="100.11464"
