@@ -1,4 +1,4 @@
-<img src="https://github.com/vzgr/CodeQZ/blob/dev/static/images/favicon-192x192.png" alt="Logo">
+<img src="https://raw.githubusercontent.com/vzgr/CodeQZ/dev/static/images/fav192.png" alt="Logo">
 <h1>CodeCrunch</h1>
 <br>
 Я бы рассказал о многих фишках CodeCrunch, но ограничусь на том, что это сайт с тестами по программированию и системой авторизации/регистрации, здесь ты можешь прокачать свои знания в сфере программирования/понять что ты делаешь не так ) Удачи!
