@@ -8,11 +8,17 @@ header{
 	background-image: url("./images/headerbg.jpg");
 	background-position: center;
 	background-size: cover;
-	box-shadow: 0 14rem 5rem 0px inset #000000ee;
+	box-shadow: 0 40rem 40rem 0px inset #000000ee;
 }
 
 header,section h1,section h3{
 	font-family: Gotham;
+}
+header h1{
+	font-size: 4rem;
+}
+header div button.btn{
+	font-size: 2rem;
 }
 
 .navbar-brand img{
