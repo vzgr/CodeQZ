@@ -1,34 +1,30 @@
-import sqlalchemy
 from flask import Flask, request, jsonify, session, redirect, url_for, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
-from flask_marshmallow import Marshmallow
-from werkzeug.utils import secure_filename
-import os
 from flask import send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from colorama import Fore
+import sqlalchemy
+import os
 import base64
 from io import BytesIO
 from PIL import Image
 from art import *
-from colorama import Fore
-from flask_cors import CORS
 
 Art = text2art("CodeCrunch",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
 print(Fore.LIGHTWHITE_EX)
 
 app = Flask(__name__)
-CORS(app)
-ma = Marshmallow(app)
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['SECRET_KEY'] = '9991secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
 first_request_initialized = False
 @app.route('/favicon.ico')
@@ -113,22 +109,10 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_extension(filename):
-    """
-    Возвращает расширsение файла, начиная с последней точки.
-
-    :param filename: Имя файла с возможным расширением.
-    :return: Расширение файла с точкой или пустая строка, если расширение отсутствует.
-    """
-    # Находим индекс последней точки в строке
     last_dot_index = filename.rfind('.')
-
     # Проверяем, есть ли после точки какое-либо расширение
-    if last_dot_index != -1:
-        # Возвращаем расширение файла
-        return filename[last_dot_index:]
-    else:
-        # Возвращаем пустую строку, если точка не найдена
-        return ""
+    if last_dot_index != -1: return filename[last_dot_index:]
+    else: return ""
 
 @app.route('/admin')
 def admin():
@@ -269,6 +253,7 @@ def process():
     else: return jsonify({"error": f"Column {page} does not exist in User model"}), 400
 
 
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory('uploads', filename)
@@ -298,23 +283,17 @@ def profile():
         user_id = session.get('user_id')
         user = db.session.get(User, user_id)
         if user:
-            email = user.email
-            utest = user.unitytest
-            jtest = user.jstest
-            ptest = user.pytest
+            email = user.emailр
             avatar_filename = find_avatar_filename(email)
             if avatar_filename:
                 avatar_url = url_for('uploaded_file', filename=avatar_filename)
             else:
                 avatar_url = url_for('static', filename='default-avatar.svg')  # Путь к аватару по умолчанию
-            return render_template('profile.html', user=user, is_authenticated=is_authenticated, avatar_url=avatar_url, javastest=jtest,
-                                   pythtest=ptest, unitygametest=utest)
+            return render_template('profile.html', user=user, is_authenticated=is_authenticated, avatar_url=avatar_url)
         else:
             return redirect(url_for('login'))
     else:
         return redirect(url_for('login'))
-
-
 @app.route('/about')
 def about():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
@@ -335,10 +314,41 @@ def get_test(test_id):
     questions = [{'question_text': question.question_text, 'answers': [{'answer_text': answer.answer_text, 'is_correct': answer.is_correct} for answer in question.answers]} for question in test.questions]
     return jsonify({'testname': test.testname, 'description': test.description, 'questions': questions})
 
+@app.route('/api/addtest', methods=['GET', 'POST'])
+def addTestByAPI():
+    data = request.get_json(force=True)
+    test = Test.query.filter_by(testname=data.get('testName')).first()
+    if not test:
+        test = Test(testname=data.get('testName'), description=data.get('testDescription'))
+        db.session.add(test)
+        db.session.flush()  # Предварительно сохраняем объект test, чтобы получить его id
+
+    question = Question(
+        test_id=test.id,  # Теперь здесь используется актуальный test.id
+        question_text=data.get('question')
+    )
+    db.session.add(question)
+    db.session.flush()  # Опционально: вы можете сразу применить flush, чтобы и question получил id.
+
+    for idx, option in enumerate(data.get('options', [])):
+        is_correct = idx == (data.get('selectedOption') - 1)
+        answer = Answer(
+            question_id=question.question_id,  # Убедитесь, что здесь используется правильный атрибут для внешнего ключа
+            answer_text=option,
+            is_correct=is_correct
+        )
+        db.session.add(answer)
+
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "message": "Question and its answers were saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Database error occurred", "message": str(e)}), 500
+
 @app.route('/test_page')
 def test_page():
     return render_template('test_page.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=80, host="0.0.0.0")
