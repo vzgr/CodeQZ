@@ -15,7 +15,7 @@
 <body>
 	<header class="pb-5 text-white container-fluid vh-100"><br>
 
-		<ul class="nav align-items-center content-fluid">
+		<ul class="nav align-items-center position-absolute">
 			<a class="navbar-brand ms-5 me-5" href="#">
 				<img src="{{url_for('static', filename='images/Logo.svg')}}" alt="CodeCrunch">
 			</a>
@@ -32,20 +32,98 @@
 				<a class="nav-link text-white" href="#">About</a>
 			</li>
 		</ul>
-		<div class="position-absolute top-50 start-50 translate-middle">
-		<h1 class="text-center">Welcome to the CodeCrunch</h1>
-		<button class="d-grid btn btn-lg mx-auto btn-primary rounded-pill mt-3 px-5">Try it</button>
-		</div>
+			<div class="b1 par"></div>
+			<div class="b2 par"></div>
+			<div class="b3 par"></div>
+			<div class="t1 par"></div>
+			<div class="t2 par"></div>
 	</header>
 
-	<section class="text-white mt-5 vh-100 container-fluid">
-		<h1 class="text-center">Become better with us!</h1>
-		<h3 class="text-center">100,000+ tests on one site</h3>
-	</section>
-
+	<div class="row m-0 vw-100 vh-100">
+		<div class="col-md-1 col-lg-6 d-flex align-items-center justify-content-center">
+			<div class=" container-sm itd-rescard">
+				<article>
+					<img src="{{url_for('static', filename='images/JavaScript.png')}}">
+				</article>
+				<h2>You <span style="color: #77cc55;">know</span> JavaScript</h2>
+				<span style="color: #77cc55;"><h1>10/10</h1></span>
+				<p>congratulations</p>
+					
+			</div>
+		</div>
+		<div class="col-md-1 col-lg-6 d-flex align-items-center justify-content-center">
+			<div class="itd-rescard">
+				<article>
+					<img src="{{url_for('static', filename='images/Python.png')}}">
+				</article>
+				<h2>You need to <span style="color: #ee6622;">learn</span> Python</h2>
+				<span style="color: #ee6622;"><h1>5/10</h1></span>
+				
+				<div class="itd-help">
+					<div class="shower">
+					<h2>missing</h2>
+					<ul>
+						<li>1. What is global decloration?<br>You answer: it's a port forwarding</li>
+						<a href="https://www.w3schools.com/python/python_variables_global.asp">Learn: https://www.w3schools.com/python/python_variables_global.asp</a>
+						<li>2. Who is creator of Python?<br>You answer: Elon Musk</li>
+						<a href="https://en.wikipedia.org/wiki/Guido_van_Rossum">Learn: https://en.wikipedia.org/wiki/Guido_van_Rossum</a>
+						<li>4. How to declorate classes in Python?<br>You answer: defclass:a{}</li>
+						<a href="https://www.w3schools.com/python/python_classes.asp">Learn: https://www.w3schools.com/python/python_classes.asp</a>
+						<li>6. What is lambda function?<br>You answer: it's greek alhpabet function</li>
+						<a href="https://www.w3schools.com/python/python_lambda.asp">Learn: https://www.w3schools.com/python/python_lambda.asp</a>
+						<li>9. What do print() doing?<br>You answer: sending commands via TCP</li>
+						<a href="https://docs.python.org/3/tutorial/inputoutput.html">Learn: https://docs.python.org/3/tutorial/inputoutput.html</a>
+						<li>10. Is standart python libruary include tkinter?<br>You answer: not in python 3+</li>
+						<a href="https://docs.python.org/3/library/tkinter.html">Learn: https://docs.python.org/3/library/tkinter.html</a>
+					</ul>
+					</div>
+					<div class="grad"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<footer>
 	</footer>
+
+	
+<!--Card show -->
+
+<script>
+
+function show(){
+	var res = document.getElementsByClassName("itd-rescard")[1];
+	var help = document.getElementsByClassName("itd-help")[0];
+	var shower = document.getElementsByClassName("shower")[0];
+	var grad = document.getElementsByClassName("grad")[0];
+	res.style.transform = "translateX(-30rem)";
+	help.style.transform = "translateX(34rem) translateZ(-10px)";
+	help.style.width = "45rem";
+	setTimeout(()=>{
+	shower.style.opacity = "1";
+	}, 400);
+
+	setTimeout(()=>{
+	grad.style.transform = "translateY(100%)";
+	}, 400);
+}
+
+
+const element = document.body;
+console.log(element)
+let lastScrollTop = 0;
+document.body.addEventListener('scroll', function( event ) {
+	console.log('hw')
+if (element.scrollTop < lastScrollTop){
+      // upscroll 
+      return;
+   } 
+   lastScrollTop = element.scrollTop <= 0 ? 0 : element.scrollTop;
+    if (element.scrollTop + element.offsetHeight>= element.scrollHeight ){
+       show();
+    }
+});
+</script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
