@@ -1,31 +1,36 @@
 from flask import Flask, request, jsonify, session, redirect, url_for, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
-from werkzeug.utils import secure_filename
-import os
 from flask import send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from colorama import Fore
+import sqlalchemy
+import os
 import base64
 from io import BytesIO
 from PIL import Image
 from art import *
-from colorama import Fore, Back, Style
 
-Art = text2art("CodeQZ",font='big',chr_ignore=True) # console logo
+Art = text2art("CodeCrunch",font='big',chr_ignore=True) # console logo
 print(Fore.GREEN + Art)
 print(Fore.LIGHTWHITE_EX)
 
+app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app = Flask(__name__)
 app.config['SECRET_KEY'] = '9991secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
+app.config['SQLALCHEMY_ECHO'] = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
 first_request_initialized = False
-
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.before_request
 def before_request():
@@ -33,6 +38,7 @@ def before_request():
     if not first_request_initialized:
         db.create_all()
         first_request_initialized = True
+
 
 
 class Base64Image:
@@ -82,31 +88,31 @@ class User(db.Model):
 
 class Test(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    testname = db.Column(db.String, nullable=False)
-    question = db.Column(db.String, nullable=False)
-    options = db.Column(db.String, nullable=False)
-    correctAnswer = db.Column(db.String, nullable=False)
+    testname = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    questions = db.relationship('Question', backref='test', lazy=True)
+
+class Question(db.Model):
+    question_id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    question_text = db.Column(db.String(120), nullable=False)
+    answers = db.relationship('Answer', backref='question', lazy=True)
+
+class Answer(db.Model):
+    answer_id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
+    answer_text = db.Column(db.String(120), nullable=False)
+    is_correct = db.Column(db.Boolean, nullable=False)
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 def get_extension(filename):
-    """
-    Возвращает расширение файла, начиная с последней точки.
-
-    :param filename: Имя файла с возможным расширением.
-    :return: Расширение файла с точкой или пустая строка, если расширение отсутствует.
-    """
-    # Находим индекс последней точки в строке
     last_dot_index = filename.rfind('.')
-
     # Проверяем, есть ли после точки какое-либо расширение
-    if last_dot_index != -1:
-        # Возвращаем расширение файла
-        return filename[last_dot_index:]
-    else:
-        # Возвращаем пустую строку, если точка не найдена
-        return ""
+    if last_dot_index != -1: return filename[last_dot_index:]
+    else: return ""
 
 @app.route('/admin')
 def admin():
@@ -131,8 +137,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
-
-
 
         base64_string = request.form['avatarBase64']
 
@@ -166,8 +170,40 @@ def register():
     return render_template('Register.html')
 
 
+@app.route('/add_question_with_answers', methods=['POST'])
+def add_question_with_answers():
+    data = request.json
+    print("Received data:", data)
+
+    test = Test.query.filter_by(testname=data.get('testName')).first()
+    if not test:
+        test = Test(testname=data.get('testName'), description=data.get('testDescription'))
+        db.session.add(test)
+        db.session.flush()  # Предварительно сохраняем объект test, чтобы получить его id
+
+    question = Question(
+        test_id=test.id,  # Теперь здесь используется актуальный test.id
+        question_text=data.get('question')
+    )
+    db.session.add(question)
+    db.session.flush()  # Опционально: вы можете сразу применить flush, чтобы и question получил id.
+
+    for idx, option in enumerate(data.get('options', [])):
+        is_correct = idx == (data.get('selectedOption') - 1)
+        answer = Answer(
+            question_id=question.question_id,  # Убедитесь, что здесь используется правильный атрибут для внешнего ключа
+            answer_text=option,
+            is_correct=is_correct
+        )
+        db.session.add(answer)
 
 
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "message": "Question and its answers were saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Database error occurred", "message": str(e)}), 500
 @app.route('/')
 def mainpage():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
@@ -193,7 +229,6 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
 
-
 @app.route('/process', methods=['POST'])
 def process():
     if 'user_id' not in session:
@@ -205,22 +240,18 @@ def process():
     page = data.get('page')
     variable = data.get('variable')
 
-    if not page or variable is None:
-        return jsonify({"error": "Missing 'page' or 'variable' data"}), 400
+    if not page or variable is None: return jsonify({"error": "Missing 'page' or 'variable' data"}), 400
 
     if hasattr(User, page):
         user = db.session.get(User, user_id)
         if user:
             setattr(user, page, variable)
             db.session.commit()
-
             return jsonify({"success": f"Column {page} updated with value {variable} for user {user_id}."})
-        else:
 
+        else: return jsonify({"error": "User not found"}), 404
+    else: return jsonify({"error": f"Column {page} does not exist in User model"}), 400
 
-            return jsonify({"error": "User not found"}), 404
-    else:
-        return jsonify({"error": f"Column {page} does not exist in User model"}), 400
 
 
 @app.route('/uploads/<filename>')
@@ -252,52 +283,72 @@ def profile():
         user_id = session.get('user_id')
         user = db.session.get(User, user_id)
         if user:
-            email = user.email
-            utest = user.unitytest
-            jtest = user.jstest
-            ptest = user.pytest
+            email = user.emailр
             avatar_filename = find_avatar_filename(email)
             if avatar_filename:
                 avatar_url = url_for('uploaded_file', filename=avatar_filename)
             else:
                 avatar_url = url_for('static', filename='default-avatar.svg')  # Путь к аватару по умолчанию
-            return render_template('profile.html', user=user, is_authenticated=is_authenticated, avatar_url=avatar_url, javastest=jtest,
-                                   pythtest=ptest, unitygametest=utest)
+            return render_template('profile.html', user=user, is_authenticated=is_authenticated, avatar_url=avatar_url)
         else:
             return redirect(url_for('login'))
     else:
         return redirect(url_for('login'))
-
-
 @app.route('/about')
 def about():
     is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
     return render_template('About.html', is_authenticated=is_authenticated)
 
-
 @app.route('/tests')
 def tests():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Tests.html', is_authenticated=is_authenticated)
+    tests = Test.query.all()
+    return render_template('Tests.html', tests=tests)
+@app.route('/api/tests')
+def get_tests():
+    tests = Test.query.all()
+    return jsonify([{'id': test.id, 'testname': test.testname, 'description': test.description} for test in tests])
 
+@app.route('/api/test/<int:test_id>')
+def get_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    questions = [{'question_text': question.question_text, 'answers': [{'answer_text': answer.answer_text, 'is_correct': answer.is_correct} for answer in question.answers]} for question in test.questions]
+    return jsonify({'testname': test.testname, 'description': test.description, 'questions': questions})
 
-@app.route('/unitytest')
-def unitytest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Unitytest.html', is_authenticated=is_authenticated)
+@app.route('/api/addtest', methods=['GET', 'POST'])
+def addTestByAPI():
+    data = request.get_json(force=True)
+    test = Test.query.filter_by(testname=data.get('testName')).first()
+    if not test:
+        test = Test(testname=data.get('testName'), description=data.get('testDescription'))
+        db.session.add(test)
+        db.session.flush()  # Предварительно сохраняем объект test, чтобы получить его id
 
+    question = Question(
+        test_id=test.id,  # Теперь здесь используется актуальный test.id
+        question_text=data.get('question')
+    )
+    db.session.add(question)
+    db.session.flush()  # Опционально: вы можете сразу применить flush, чтобы и question получил id.
 
-@app.route('/pytest')
-def pytest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Pytest.html', is_authenticated=is_authenticated)
+    for idx, option in enumerate(data.get('options', [])):
+        is_correct = idx == (data.get('selectedOption') - 1)
+        answer = Answer(
+            question_id=question.question_id,  # Убедитесь, что здесь используется правильный атрибут для внешнего ключа
+            answer_text=option,
+            is_correct=is_correct
+        )
+        db.session.add(answer)
 
+    try:
+        db.session.commit()
+        return jsonify({"success": True, "message": "Question and its answers were saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Database error occurred", "message": str(e)}), 500
 
-@app.route('/jstest')
-def jstest():
-    is_authenticated = 'user_id' in session  # здесь будит True, если пользователь авторизован
-    return render_template('Jstest.html', is_authenticated=is_authenticated)
-
+@app.route('/test_page')
+def test_page():
+    return render_template('test_page.html')
 
 if __name__ == '__main__':
-    app.run(debug=False, port=80, host="0.0.0.0")
+    app.run(debug=True, port=80, host="0.0.0.0")
