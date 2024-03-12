@@ -191,3 +191,8 @@ header .b3{
 	background: linear-gradient(to top, var(--blue) 50%, rgba(0,0,0,0) 100%);;
 	width: 45rem;
 }
+.sechead{
+	font-family: Gotham;
+	font-size: 6rem;
+	margin-top: 7rem;
+}
